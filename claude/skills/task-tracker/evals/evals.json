@@ -1,0 +1,62 @@
+{
+  "skill_name": "task-tracker",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "作業開始。Schedule View の Phase A に取りかかる。",
+      "expected_output": "起動時に `.claude/memory/` + `INDEX.md` の存在で per-chat / legacy モードを自動判定。legacy なら MEMORY.md を読み込み、「予定」から Schedule View タスクを「進行中」に移動。### 🔧 ブロックで着手日・対象・前回/現在/次を記載。「予定」から該当項目を削除。",
+      "files": [".claude/MEMORY.md"]
+    },
+    {
+      "id": 2,
+      "prompt": "作業終了。Schedule View Phase A が完了した。",
+      "expected_output": "legacy モードなら MEMORY.md と HISTORY.md を読み込み、「進行中」から完了タスクを削除して「直近の完了」に追加。HISTORY.md に完了記録を追記。計画書アーカイブ判定 → ローリングアーカイブ判定 → メタファイル限定 commit。",
+      "files": [".claude/MEMORY.md", ".claude/HISTORY.md"]
+    },
+    {
+      "id": 3,
+      "prompt": "今日はここで中断する。まだ途中だけど。",
+      "expected_output": "該当タスクのステータスを ⏸️ に変更。前回/現在/次を最新の進捗に更新。history (per-chat なら chat-<self>.md、legacy なら HISTORY.md) に中断記録を追記。",
+      "files": [".claude/MEMORY.md", ".claude/HISTORY.md"]
+    },
+    {
+      "id": 4,
+      "prompt": "session start",
+      "expected_output": "mode 判定 → 該当 memory ファイルを読み込み、現在の進行中タスクの状態を報告。per-chat モードでは memory/INDEX.md からも他チャットの進行中タスクを把握。進行中タスクがなければ「予定」のタスク一覧を提示。",
+      "files": [".claude/MEMORY.md"]
+    },
+    {
+      "id": 5,
+      "prompt": "Diagram View と Settings View を並行して進めたい。両方開始して。",
+      "expected_output": "「予定」から両タスクを「進行中」に移動。それぞれ ### 🔧 ブロックを作成。複数タスクの並行管理が正しく処理される。per-chat モードでは memory/INDEX.md も再生成される。",
+      "files": [".claude/MEMORY.md"]
+    },
+    {
+      "id": 6,
+      "prompt": "作業開始。chat-engineer として DU-B-3 着手。",
+      "expected_output": "per-chat モード判定 (`.claude/memory/` + `INDEX.md` 存在) → `.claude/comm/.session-name` から self=`engineer` を取得 → `.claude/memory/chat-engineer.md` を読み込み (なければ初期テンプレートで作成)。「予定」から DU-B-3 タスクを「進行中」に移動。Edit 後 memory/INDEX.md を再生成 (全 chat-*.md を scan して across all chats で集約)。",
+      "files": [
+        ".claude/memory/chat-engineer.md",
+        ".claude/memory/INDEX.md",
+        ".claude/comm/.session-name"
+      ]
+    },
+    {
+      "id": 7,
+      "prompt": "作業開始。",
+      "expected_output": "per-chat モード判定で `.claude/comm/.session-name` が存在しない / 中身が空 / `chat-` プレフィックスを含む / 空白や `/`, `.` を含む場合は **エラー停止**。「`echo <本体部分のみ> > .claude/comm/.session-name` で正しく作成してから再試行してください」と提示。自己判定不能のまま書き込まない (他チャットファイル上書き事故防止)。",
+      "files": [".claude/comm/.session-name"]
+    },
+    {
+      "id": 8,
+      "prompt": "作業終了。DU-B-3 が完了した。",
+      "expected_output": "per-chat モードで self=`engineer` → `.claude/memory/chat-engineer.md` の「進行中」から完了タスク削除 + 「直近の完了」追加。`.claude/history/chat-engineer.md` 先頭に詳細エントリ追記。計画書アーカイブ判定 → history/chat-engineer.md が 5 件超なら `history/archive/YYYY-MM/chat-engineer.md` へ移動。memory/INDEX.md + history/INDEX.md を再生成。**pathspec は自チャットの 4 ファイル限定** (`git add .claude/memory/chat-engineer.md .claude/memory/INDEX.md .claude/history/chat-engineer.md .claude/history/INDEX.md`)。他チャットの chat-*.md は絶対に触らない (単一書込者原則)。`git add -A` は per-chat モードで原則禁止。",
+      "files": [
+        ".claude/memory/chat-engineer.md",
+        ".claude/memory/INDEX.md",
+        ".claude/history/chat-engineer.md",
+        ".claude/history/INDEX.md"
+      ]
+    }
+  ]
+}

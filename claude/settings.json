@@ -1,0 +1,103 @@
+{
+  "permissions": {
+    "allow": ["Edit", "Write", "Bash(*)", "WebSearch", "mcp__pencil"],
+    "deny": [
+      "Bash(rm -rf *)",
+      "Bash(git push --force *)",
+      "Bash(git reset --hard *)",
+      "Bash(git clean -f *)"
+    ],
+    "defaultMode": "auto"
+  },
+  "model": "claude-fable-5[1m]",
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node {{CLAUDE_DIR}}/hooks/lead-pipeline-gate.mjs"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node {{CLAUDE_DIR}}/hooks/post-edit-prettier.mjs"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|Read",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node {{CLAUDE_DIR}}/hooks/protect-files.mjs"
+          }
+        ]
+      },
+      {
+        "matcher": "Skill",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node {{CLAUDE_DIR}}/hooks/skill-launch-notice.mjs"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node {{CLAUDE_DIR}}/hooks/sui-memory.mjs recall",
+            "timeout": 30000
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node {{CLAUDE_DIR}}/hooks/sui-memory.mjs save",
+            "timeout": 60000
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node {{CLAUDE_DIR}}/hooks/notify.mjs"
+          }
+        ]
+      }
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "node {{CLAUDE_DIR}}/statusline-command.mjs"
+  },
+  "enabledPlugins": {},
+  "alwaysThinkingEnabled": true,
+  "effortLevel": "xhigh",
+  "skipWorkflowUsageWarning": true,
+  "remoteControlAtStartup": true,
+  "agentPushNotifEnabled": true,
+  "skipAutoPermissionPrompt": true
+}

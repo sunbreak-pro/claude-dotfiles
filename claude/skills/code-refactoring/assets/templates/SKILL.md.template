@@ -1,0 +1,44 @@
+---
+name: {{LANG}}-refactoring
+description: {{PROJECT_NAME}}プロジェクト向け{{LANG_DISPLAY}}リファクタリングスキル。{{LANG_DISPLAY}}コードの関数/クラス分割、パフォーマンス最適化、言語固有のイディオム適用を行う。コードレビューやリファクタリング指示時に使用する。
+---
+
+# {{LANG_DISPLAY}} Refactoring — {{PROJECT_NAME}}
+
+汎用スキル `~/.claude/skills/code-refactoring/` の言語固有拡張。
+汎用スキルの命名規則・DRY原則ワークフローと併用すること。
+
+## 言語固有の規約
+
+<!-- プロジェクトの規約に合わせて編集 -->
+
+### 命名規則の補足
+
+- 変数: {{NAMING_VAR}}
+- 関数: {{NAMING_FUNC}}
+- クラス: {{NAMING_CLASS}}
+- 定数: {{NAMING_CONST}}
+
+### インポート順序
+
+{{IMPORT_ORDER}}
+
+## 関数/クラスの分割基準
+
+- 1関数あたりの推奨行数上限: {{MAX_FUNC_LINES}}行
+- 1クラスあたりの推奨責務数: 単一責務（SRP）
+- 分割判断の目安:
+  - インデントが{{MAX_INDENT}}段以上 → 関数抽出を検討
+  - 引数が{{MAX_ARGS}}個以上 → オブジェクトまたはデータクラスへ集約を検討
+
+## パフォーマンス最適化パターン
+
+<!-- プロジェクトで頻出するパターンを記載 -->
+
+{{PERF_PATTERNS}}
+
+## プロジェクト固有ルール
+
+<!-- このプロジェクト特有の規約やアンチパターンを記載 -->
+
+{{PROJECT_RULES}}

@@ -1,0 +1,22 @@
+{
+  "$comment": "claude/<src> → ~/.claude/<dest> のリンク対象一覧。mode: link = symlink(失敗時 copy) / template = {{CLAUDE_DIR}} を実パスに展開してコピー(常に copy)",
+  "entries": [
+    { "src": "claude/CLAUDE.md", "dest": "CLAUDE.md", "mode": "link" },
+    {
+      "src": "claude/settings.json",
+      "dest": "settings.json",
+      "mode": "template"
+    },
+    {
+      "src": "claude/statusline-command.mjs",
+      "dest": "statusline-command.mjs",
+      "mode": "link"
+    },
+    { "src": "claude/hooks", "dest": "hooks", "mode": "link" },
+    { "src": "claude/rules", "dest": "rules", "mode": "link" },
+    { "src": "claude/agents", "dest": "agents", "mode": "link" },
+    { "src": "claude/skills", "dest": "skills", "mode": "link" },
+    { "src": "claude/docs", "dest": "docs", "mode": "link" },
+    { "src": "claude/templates", "dest": "templates", "mode": "link" }
+  ]
+}

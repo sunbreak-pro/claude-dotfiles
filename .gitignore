@@ -1,0 +1,40 @@
+# --- 秘匿情報・マシン固有 state（絶対にコミットしない） ---
+.credentials.json
+*credentials*
+*.pem
+*.key
+.env
+.env.*
+
+# Claude Code runtime state（万一 repo 内に紛れ込んでも追跡しない）
+cache/
+sessions/
+session-env/
+shell-snapshots/
+projects/
+history.jsonl
+ide/
+backups/
+downloads/
+todos/
+file-history/
+paste-cache/
+plans/
+plugins/
+tasks/
+usage-data/
+chrome/
+debug/
+stats-cache.json
+mcp-needs-auth-cache.json
+.last-*
+settings.local.json
+
+# 退避ファイル
+*.bak
+*.bak.*
+
+# OS noise
+.DS_Store
+Thumbs.db
+node_modules/
