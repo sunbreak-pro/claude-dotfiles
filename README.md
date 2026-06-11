@@ -12,9 +12,9 @@ claude-dotfiles/
 │   ├── settings.json        # テンプレート（{{CLAUDE_DIR}} を install 時に実パス展開）
 │   ├── statusline-command.mjs
 │   ├── hooks/               # 全 hook（Node 製・クロスプラットフォーム）
-│   ├── rules/               # グローバルルール (9 ファイル)
+│   ├── rules/               # グローバルルール (10 ファイル)
 │   ├── agents/              # グローバルエージェント定義 (9 ファイル)
-│   ├── skills/              # グローバルスキル (15 個)
+│   ├── skills/              # グローバルスキル (16 個)
 │   ├── docs/                # hooks_guide.md
 │   └── templates/           # comm-protocol テンプレート
 ├── manifest.json            # リンク対象一覧（src → ~/.claude/<dest> + mode）
@@ -38,6 +38,7 @@ claude-dotfiles/
 | hook イベント                  | 旧実装                                     | 新実装                                                     |
 | ------------------------------ | ------------------------------------------ | ---------------------------------------------------------- |
 | UserPromptSubmit               | `hooks/lead-pipeline-gate.sh` (sh+jq+grep) | `hooks/lead-pipeline-gate.mjs`                             |
+| UserPromptSubmit               | —（新設）                                  | `hooks/ultracode-gate.mjs`（ultracode 検出で並列采配注入） |
 | PostToolUse (Edit\|Write)      | inline sh+jq → prettier                    | `hooks/post-edit-prettier.mjs`                             |
 | PreToolUse (Edit\|Write\|Read) | inline sh+jq 秘匿ファイルブロック          | `hooks/protect-files.mjs`                                  |
 | PreToolUse (Skill)             | inline sh+jq スキル起動宣言                | `hooks/skill-launch-notice.mjs`                            |

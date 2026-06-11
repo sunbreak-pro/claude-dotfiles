@@ -1,6 +1,6 @@
 ---
 name: execution-router
-description: 実行戦略のオーケストレーター判断ガイド。長時間・反復・並列・条件達成型の作業に対し /goal・/batch・/loop・subagent・/background・/simplify・/ultrareview のどれを使うべきか判断し、ユーザーが貼るコマンド文字列を具体的に提案する。既存 role-* agent / session-verifier / git-orchestrator / task-tracker と連携。Triggers include "全部通るまで", "回し続けて", "自動で進めて", "一括置換", "全置換", "並列で", "リポジトリ全体", "定期的に", "ずっと監視", "放置で", "長時間タスク", "どうやって回す", "goal", "batch", "loop", "auto run", "long running", "parallelize".
+description: 実行戦略のオーケストレーター判断ガイド。長時間・反復・並列・条件達成型の作業に対し /goal・/batch・/loop・subagent・/background・/simplify・/ultrareview・ultracode のどれを使うべきか判断し、ユーザーが貼るコマンド文字列を具体的に提案する。既存 role-* agent / session-verifier / git-orchestrator / task-tracker と連携。Triggers include "全部通るまで", "回し続けて", "自動で進めて", "一括置換", "全置換", "並列で", "リポジトリ全体", "定期的に", "ずっと監視", "放置で", "長時間タスク", "どうやって回す", "goal", "batch", "loop", "ultracode", "総力戦", "auto run", "long running", "parallelize".
 ---
 
 # Execution Router — 実行戦略の判断ガイド
@@ -36,6 +36,7 @@ description: 実行戦略のオーケストレーター判断ガイド。長時�
 | **大規模で機械的**、5〜30 の独立単位に分解可、並列化したい、各単位 PR 化したい                   | **`/batch`**       | git-orchestrator（PR/branch 保護）/ role-qa（各 PR 監査） |
 | **時間・間隔ベース**の反復、外部状態（CI/deploy/remote queue）のポーリング                       | **`/loop`**        | loop skill                                                |
 | 1 つの複雑多段タスク、隔離コンテキストが要る、多数並列ではない                                   | **subagent**       | role-pm → role-engineer → role-qa                         |
+| 重量級 1 タスク、**独立単位へ並列分解可**（2〜5 unit）、PR は 1 本に統合したい                   | **`ultracode`**    | ultracode skill（マルチエージェント並列采配）             |
 | セッション全体を切り離して放置したい                                                             | **`/background`**  | （以後 `claude agents` で監視）                           |
 | 変更済みコードの品質・重複・効率の手術                                                           | **`/simplify`**    | simplify skill                                            |
 | ブランチ/PR のマルチエージェント・クラウドレビュー                                               | **`/ultrareview`** | （ユーザートリガー専用）                                  |
@@ -45,6 +46,7 @@ description: 実行戦略のオーケストレーター判断ガイド。長時�
 - **「終わり」を機械が判定できるか** → Yes かつ単一リポジトリで逐次 → `/goal`
 - **独立単位に割れて並列が効くか** → Yes かつ各単位 PR 化 → `/batch`
 - **終わりが時刻・外部イベント依存か** → `/loop`
+- **並列が効く重タスクで PR を割る必要が無いか** → Yes → `ultracode`（unit ごとに PR 化したいなら `/batch`）
 - **どれでもなく単に重い 1 タスク** → subagent 分散（`/batch` ではない）
 
 ## 出力フォーマット
@@ -66,8 +68,10 @@ description: 実行戦略のオーケストレーター判断ガイド。長時�
   例: `/goal all tests under frontend/src pass and `npm run build` is clean`
 - `/batch` … **何を→何に**を 1 文で。分解は /batch 側が行う。
   例: `/batch replace all moment.js imports with dayjs across the repo, updating call sites to dayjs syntax`
-- `/loop` … 間隔 + 実行内容。
+- `/loop` … 間隔 + 実行内容。即貼りテンプレ集は [[heavy-workflows]] ルール参照。
   例: `/loop 5m check the latest GitHub Actions run on this branch and report only on failure`
+- `ultracode` … スラッシュコマンドではなく**プロンプトに含めるキーワード**。
+  例: `ultracode implement the offline sync layer end-to-end with tests`
 
 ## 安全則（必須）
 
