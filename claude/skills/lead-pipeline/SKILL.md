@@ -28,6 +28,8 @@ description: 外来の実装タスクを受けた瞬間に、軽重ティアを�
 
 判定に迷ったら**一段重い方**に倒す（過剰実行より取りこぼし防止）。ただし軽を中に上げない（typo に verifier は過剰）。
 
+**ultracode 修飾**: プロンプトに `ultracode` キーワードが含まれる場合はティア判定を省略して重ティア扱いとし、並列最大化版の采配（ultracode スキル）に従う。lead-pipeline-gate と ultracode-gate が両発火した場合は ultracode 優先。
+
 ## 中ティアの手順
 
 1. 実装（必要なら role-engineer を Agent 起動、軽めならメイン直接）

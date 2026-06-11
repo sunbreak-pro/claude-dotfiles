@@ -18,6 +18,10 @@
           {
             "type": "command",
             "command": "node {{CLAUDE_DIR}}/hooks/lead-pipeline-gate.mjs"
+          },
+          {
+            "type": "command",
+            "command": "node {{CLAUDE_DIR}}/hooks/ultracode-gate.mjs"
           }
         ]
       }
