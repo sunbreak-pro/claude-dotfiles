@@ -45,6 +45,39 @@ per-chat モードでは `<self>` を `.claude/comm/.session-name` から取得�
 
 エラー時の提示メッセージ例: 「`.claude/comm/.session-name` を `echo <本体部分のみ> > .claude/comm/.session-name` で正しく作成してください（例: `engineer`, `main`, `qa` 等。`chat-` プレフィックスは不要）」
 
+## セッション状態の判定
+
+起動時、ユーザー発話や状況から「どのフローを実行するか」を判定する。かつて専用のセッション管理エージェントが担っていた状態判定を task-tracker 本体へ統合した。判断に迷ったら推測せず確認する。
+
+### 入力シグナル → 状態の対応表
+
+| ユーザー発話・状況                                              | 判定    | 実行するフロー                                               |
+| --------------------------------------------------------------- | ------- | ------------------------------------------------------------ |
+| 「作業開始」「session start」「再開する」「次のタスクやる」     | START   | 作業開始フロー（multi-session-coordinator 競合チェック込み） |
+| 「進捗確認」「MEMORY 見せて」「今どこまで」「他チャットの状況」 | INSPECT | inspect モードフロー（Read のみ。書き込みなし）              |
+| 「中断」「途中保存」「session pause」「ちょっと止める」         | PAUSE   | 作業途中フロー                                               |
+| 「作業終了」「コミットして」「session end」「PR 出せる状態に」  | END     | session-verifier を先に実行 → 作業終了フロー                 |
+| 曖昧（「これで終わり？」「進める？」など）                      | ASK     | 下記「判定が曖昧なときの確認手順」                           |
+
+### 判定が曖昧なときの確認手順
+
+1. 現在の memory（per-chat: `.claude/memory/chat-<self>.md` / legacy: `.claude/MEMORY.md`）を Read して状態を把握する
+2. ユーザーに具体的な状態を提示して確認する:
+
+   ```
+   現在の状態:
+   - 進行中: 🔧 タスク名（着手日: YYYY-MM-DD）
+     - 現在: ...
+     - 次: ...
+
+   ご希望の操作はどれですか？
+   1. 作業を再開（次のサブタスクへ）
+   2. 中断（途中保存して終了）
+   3. 完了（HISTORY に記録してコミット）
+   ```
+
+3. 回答を得てから対応するフローを実行する
+
 ## 対象ファイル
 
 ### per-chat モード
@@ -212,6 +245,13 @@ per-chat モードの `chat-<self>.md` も legacy モードの `MEMORY.md` / `HI
 
 ## 作業開始フロー
 
+### Step 0 前 — 並行チャット競合チェック（条件付き）
+
+他チャットが同時に活動している可能性がある場合のみ実行する（単独セッションならスキップ可。かつて専用のセッション管理エージェントの START フローが担っていた手順を統合）。
+
+- `.claude/active-sessions/` に自分以外のセッションファイルがある、または共有ファイル（memory/history）を複数チャットが触りうる構成のとき、**multi-session-coordinator を先に起動**して競合の有無を確認する（`.claude/active-sessions/<my-session-id>.json` の存在で起動済みかを判定。未起動なら呼び出す）
+- 競合が解消されてから以降の Step に進む
+
 ### Step 0 — モード判定 + self 解決
 
 1. `test -d .claude/memory/` で per-chat モード判定
@@ -377,6 +417,7 @@ per-chat モードの `chat-<self>.md` も legacy モードの `MEMORY.md` / `HI
     - f. 失敗時はエラーをユーザーに表示し、手動対応を促す
 
 11. 更新結果をユーザーに表示
+12. 計画書アーカイブを実行した場合（= 実装プランを完了した場合）は、**PR を出すか確認し、出すなら git-branch-flow へ委譲する**
 
 ## inspect モードフロー
 
@@ -385,7 +426,7 @@ per-chat モードの `chat-<self>.md` も legacy モードの `MEMORY.md` / `HI
 ### 起動条件
 
 - ユーザーが「他チャットの状況見せて」「inspect」「per-chat ダッシュボード」等と発話
-- session-manager / multi-session-coordinator から「INDEX.md 鮮度が古いので直接 Read」と判断されたとき
+- multi-session-coordinator から「INDEX.md 鮮度が古いので直接 Read」と判断されたとき
 
 per-chat モード判定 (Step 0 と同じ条件) を満たさない場合は inspect モードを起動せず即エラー停止し「per-chat 機構が未導入のプロジェクトでは inspect モードは使用不可」と提示する (legacy には共有ファイルしかなく意味がない)。
 
@@ -457,3 +498,4 @@ per-chat モード判定 (Step 0 と同じ条件) を満たさない場合は in
 - **INDEX 再生成失敗時**: per-chat モードで INDEX 再生成に失敗してもチャット別ファイルへの書き込みは成功扱いとし、INDEX は次回 task-tracker 実行で再試行 (致命扱いしない)
 - **legacy → per-chat の移行**: 既存プロジェクトの `.claude/MEMORY.md` を凍結し新規エントリのみ per-chat にする場合、凍結ファイル先頭に「FROZEN since YYYY-MM-DD」マーカーを置く。task-tracker は `.claude/memory/` 存在で自動的に per-chat モードに切り替わるため、凍結マーカーは人間向けの注意書きとして機能 (ロジック判定は使わない)
 - **inspect モードは副作用ゼロ**: Read のみで Edit / Write / INDEX 再生成 / git 操作いずれも行わない。per-chat モード成立時のみ使用可 (legacy では意味がなく即エラー停止)
+- **sui-memory との境界**: タスク状態の正本は本スキル (per-chat memory/ + history/)。sui-memory はセッション横断の自動要約のみを担う。詳細は `rules/memory-boundary.md` を参照

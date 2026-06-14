@@ -19,7 +19,7 @@
 
 ### オーケストレーター型を優先
 
-新規エージェントは既存スキル（task-tracker / session-loader / session-verifier / code-review 等）と機能を重複させない。状況判断と振り分けに専念し、実作業は既存スキルに委譲する。
+新規エージェントは既存スキル（task-tracker / session-verifier / code-review 等）と機能を重複させない。状況判断と振り分けに専念し、実作業は既存スキルに委譲する。
 
 ### effort/model 設定方針
 

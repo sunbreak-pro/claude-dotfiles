@@ -6,7 +6,7 @@
 
 - 反復・ポーリング・時間ベースの意図（「定期的に」「監視して」「〜まで放置で」）を読んだら **execution-router** を起動し、貼り付け可能な `/loop` コマンド文字列を提示する
 - 重量級（機能追加 / 層横断 / 影響範囲不明）かつ独立単位への並列分解が効くタスクでは、**プロンプトに `ultracode` を付けて送り直す**ことを 1 行で提案する（マルチエージェント・オーケストレーションへのオプトイン）
-- ultracode が既にプロンプトに含まれる場合は提案不要。skills/ultracode の采配に直接従う（ultracode-gate hook が注入する）
+- ultracode が既にプロンプトに含まれる場合は提案不要。lead-pipeline の ultracode モード（references/ultracode-mode.md）に従う（pipeline-gate hook が注入する）
 
 ## /loop 即貼りテンプレ
 

@@ -60,6 +60,49 @@ refactor/dataservice-extract-cache
 
 ---
 
+### worktree の命名規約と cleanup 基準
+
+複数の git worktree を運用する場合、以下を遵守する。
+
+**命名規約**:
+
+- worktree ディレクトリ名は **branch 名の `/` を `-` に置換**したもの（手動 `git worktree add` 時）
+  - 例: branch `feat/task-priority-sort` → worktree dir `feat-task-priority-sort`
+- `+` 記号は worktree dir 名・branch 名のいずれにも**使わない**（パスとして扱いにくく shell escape の罠になる）
+- 配置先は `<repo>/.claude/worktrees/<name>` で統一
+- 公式 `claude --worktree <name>` は **branch 名に `worktree-` prefix を自動付与**する（dir 名は `<name>` のまま / v2.1.150 実測）。命名規約を厳守したいなら `git worktree add` を手動実行、`claude --worktree` 経由なら prefix を受け入れる
+
+**cleanup 基準**（以下 4 つを満たしたら `git worktree remove` 候補）:
+
+1. 紐付く PR が MERGED 済 **かつ**
+2. `git -C <wt> log origin/main..HEAD --oneline` が空（未マージ commit なし） **かつ**
+3. `git -C <wt> status -s` が空（dirty なし） **かつ**
+4. **その worktree を cwd とする稼働セッションが存在しない** — multi-session-coordinator の Layer 1（`claude agents --json`）で確認。git mtime / PR / reflog だけで「inactive」と判断するのは禁止（最も信頼できる活動シグナルは稼働中プロセス）
+
+4 つ揃わない場合は作業中の可能性があるため `.claude/memory/INDEX.md` と `.claude/comm/outbox/` も確認してから判断する。
+
+**branch 削除の安全則**:
+
+- 上記を満たし PR MERGED 済 → `git branch -d <branch>`（fast-forward 判定で安全削除）
+- PR 紐付け無し + 未マージ commit 無し → `git branch -D <branch>` 可（`git log <branch> --not main origin/main` で差分 0 を再確認）
+- いずれにも当てはまらない → 削除しない（gate）
+
+### Multi-chat Worktree Policy（採用プロジェクト限定）
+
+プロジェクトの `CLAUDE.md` に "Multi-chat Worktree Policy" 節がある場合（例: life-editor §7.4）、**メインリポジトリは指定の専有ブランチ（通常 `main`）のみを許可**する。lead-pipeline スキルの "Worktree Policy" 節と相互に参照する（采配の入口はそちら、ブランチ手順は本節）。
+
+| 状況                                                                                                                                | 対応                                                                                                                                                                                   |
+| ----------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| メインリポジトリ（`git rev-parse --show-toplevel` が `.claude/worktrees/` 配下でない）で feature への `git checkout` を提案されたら | **停止**。worktree 経由に誘導                                                                                                                                                          |
+| feature 作業の開始要求                                                                                                              | **3 段必須セット**: `git worktree add .claude/worktrees/<slug>/ -b <branch>` → `cd .claude/worktrees/<slug>/` → `echo <branch> > .claude/comm/.session-branch`（最後に `claude` 起動） |
+| 既存 feature branch を別チャットで触りたい                                                                                          | `git worktree add .claude/worktrees/<slug>/ <existing-branch>` → `cd` → `echo <existing-branch> > .claude/comm/.session-branch`                                                        |
+| 同一 branch を 2 つの worktree から触ろうとした                                                                                     | **停止**。git 仕様で禁止（`--force` は破損リスク）。branch 分割を提案                                                                                                                  |
+| `.session-branch` 未宣言で feature worktree 起動                                                                                    | （proactive 失敗時のフォールバック）`echo <branch> > .claude/comm/.session-branch` を促す。SessionStart hook 検査は `.session-branch` 存在時のみ動くため、未宣言だと無音スキップする   |
+
+policy 不在のプロジェクトでは本節をスキップし §1 GitHub Flow に従う。
+
+---
+
 ## 3. ブランチ作成手順
 
 ```bash
@@ -251,7 +294,7 @@ PR 作成時の lockfile 変更は通常 OK。ただし lockfile **だけ** が�
 - 「main を取り込む」「rebase」「squash」「merge して」
 - 「マージ方法どれにする?」
 - main / master ブランチで作業しようとしているとき
-- `git-orchestrator` agent からの委譲
+- `git-workflow` skill からの委譲
 
 ---
 
