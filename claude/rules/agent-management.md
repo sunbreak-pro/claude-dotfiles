@@ -1,4 +1,12 @@
+---
+paths:
+  - "**/agents/**"
+  - "**/agents-lib/**"
+---
+
 # Agent Management
+
+> path-scoped rule: エージェント定義（`agents/` ・ `agents-lib/`）を扱う時のみ自動ロードされる（毎セッション常駐させない）。
 
 ## 一元管理ルール
 
