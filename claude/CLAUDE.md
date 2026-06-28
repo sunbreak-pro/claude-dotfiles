@@ -43,7 +43,7 @@
 ## Heavy Work Modes
 
 - 反復・ポーリングは `/loop`、条件達成型は `/goal`、大規模機械的変更は `/batch`。モード選定と貼り付け用コマンド提示は execution-router スキルに委譲する
-- 重量級タスクはプロンプトに `ultracode` キーワードを含めるとマルチエージェント並列采配（skills/ultracode）が発動する。該当しそうなタスクでは Claude から付与を提案する
+- 重量級タスクはプロンプトに `ultracode` キーワードを含めるとマルチエージェント並列采配（lead-pipeline の ultracode モード, references/ultracode-mode.md）が発動する。該当しそうなタスクでは Claude から付与を提案する
 - 運用詳細: `rules/heavy-workflows.md`
 
 ## Project Documentation Structure（全プロジェクト共通の運用ルール）

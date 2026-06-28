@@ -9,12 +9,84 @@ MANDATORY FIRST ACTION: Output `<The git-workflow will launch>` before doing any
 
 このスキルは git 操作の **規約と安全則の参照書** です。手順カタログは別スキルに分離しています。
 
-| 用途                                                    | 担当スキル                     |
-| ------------------------------------------------------- | ------------------------------ |
-| コミット規約 / Co-Authored-By / 破壊的コマンドの境界    | **git-workflow**（このスキル） |
-| ブランチ戦略 / PR 作成 / merge vs rebase vs squash 判断 | `git-branch-flow`              |
-| コンフリクト解析・解決提案                              | `git-conflict-resolver`        |
-| 状況判断 + 戦略決定 + 上記スキル委譲                    | `git-orchestrator` agent       |
+| 用途                                                    | 担当スキル                                 |
+| ------------------------------------------------------- | ------------------------------------------ |
+| コミット規約 / Co-Authored-By / 破壊的コマンドの境界    | **git-workflow**（このスキル）             |
+| ブランチ戦略 / PR 作成 / merge vs rebase vs squash 判断 | `git-branch-flow`                          |
+| コンフリクト解析・解決提案                              | `git-conflict-resolver`                    |
+| 状況判断 + 戦略決定 + 上記スキル委譲                    | **git-workflow**（本スキル §0 冒頭フロー） |
+
+---
+
+## 0. 状況把握と戦略決定（オーケストレーション冒頭フロー）
+
+「コミットして」「push して」「PR 作って」等で起動したら、規約を適用する前に現状を把握し戦略を決める。かつて専用の git オーケストレーターが担っていた司令塔機能を本スキル冒頭に統合した。実作業（ブランチ / PR 手順は git-branch-flow、conflict は git-conflict-resolver）は委譲する。
+
+### 0.1 自動化レベル（標準モード）
+
+| 操作                               | 動作                                        |
+| ---------------------------------- | ------------------------------------------- |
+| commit                             | 自動実行（メッセージ案を 1 度提示してから） |
+| push（feature branch）             | 自動実行                                    |
+| push（main / master / production） | **ブロック**。branch 切替を提案             |
+| PR 作成                            | ユーザー確認後に実行                        |
+| merge                              | ユーザー確認後に実行                        |
+| rebase（自分専用 branch）          | ユーザー確認後に実行                        |
+| rebase（共有 branch）              | **ブロック**。理由説明                      |
+| `--force`                          | **完全ブロック**                            |
+| `--force-with-lease`（feature）    | ユーザー確認後                              |
+| `--force-with-lease`（保護 ref）   | **ブロック**                                |
+| conflict                           | 解析・提案のみ。編集はユーザー OK 後        |
+
+### 0.2 状況把握（必ず最初に、並列実行）
+
+```bash
+git status                                            # dirty 状態 + branch
+git branch --show-current                             # 現在ブランチ
+git log --oneline -5                                  # 直近コミット
+git rev-list --count @{u}..HEAD 2>/dev/null || echo 0 # 未 push commit 数
+git rev-list --count HEAD..@{u} 2>/dev/null || echo 0 # 未 pull commit 数
+git diff --stat                                       # 未ステージ変更
+git diff --cached --stat                              # ステージ済み変更
+gh pr list --head $(git branch --show-current) --json number,url 2>/dev/null || true  # 既存 PR
+```
+
+> 状況把握の出力が長くなりそうな場合（復旧作業・大量の未追跡ファイル・多 worktree 等）は、汎用エージェントに調査を委譲して要約のみ受け取る。
+
+### 0.3 状況分類と戦略決定
+
+| 状況                                         | 推奨アクション                                                |
+| -------------------------------------------- | ------------------------------------------------------------- |
+| 現在 main / master / production にいて dirty | **branch 切替提案**（git-branch-flow §3）: `feat/<提案 slug>` |
+| feature branch、未コミット変更あり           | コミット提案 → push 提案                                      |
+| 未 push commit が積まれている                | push 提案                                                     |
+| 未 pull commit がある（上流が進んでいる）    | rebase or merge 提案（git-branch-flow §4）→ conflict 警戒     |
+| Unmerged paths あり                          | `git-conflict-resolver` へ委譲                                |
+| feature branch + commit 済 + PR なし         | PR 作成提案（git-branch-flow §5、ユーザー確認）               |
+| feature branch + PR あり                     | PR ステータス確認（`gh pr checks`）                           |
+
+### 0.4 ユーザー意図の補完
+
+「コミットして」だけでも黙って判断する: main にいる → branch 切替を先に提案 / conflict 中 → 解決が先 / staged も unstaged もない →「コミットする変更がありません」。「PR 作って」→ 未コミットなら先に commit、未 push なら先に push、既存 PR があれば更新可否を確認。
+
+### 0.5 出力フォーマット
+
+```markdown
+## 状況サマリ
+
+- branch: <current> (<protected? / feature?>)
+- dirty: staged=<n>, unstaged=<n>, untracked=<n>
+- 上流差分: ahead=<n>, behind=<n>
+- 既存 PR: <#n url> or なし
+
+## 推奨アクション
+
+1. <最優先> 2. <次> 3. <その次>
+
+## 確認事項
+
+- <ユーザー判断が必要な点>
+```
 
 ---
 
@@ -166,14 +238,13 @@ git config --global init.defaultBranch main
 このスキルは以下のときに参照する:
 
 - ユーザーが「コミット」「push」「git の規約」「コミットメッセージ」と言ったとき
-- 他のスキル / agent（git-orchestrator / git-branch-flow / git-conflict-resolver）が規約を確認したいとき
+- 他のスキル（git-branch-flow / git-conflict-resolver）が規約を確認したいとき
 - 破壊的コマンドの可否を判断するとき
 
 実際の手順実行は以下に委譲する:
 
 - branch / PR / merge → `git-branch-flow`
 - conflict → `git-conflict-resolver`
-- 状況判断と委譲 → `git-orchestrator` agent
 
 ---
 

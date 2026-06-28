@@ -231,7 +231,7 @@ git rerere diff                            # 直近の自動適用差分
 - ユーザーが「conflict」「コンフリクト」「競合」「マージ失敗」「rebase 中に止まった」と言ったとき
 - `git status` 結果に `Unmerged paths:` または `you are currently merging` / `you are currently rebasing` が含まれるとき
 - git 操作の出力に `CONFLICT (content):` / `Automatic merge failed` が現れたとき
-- `git-orchestrator` agent からの委譲
+- `git-workflow` skill からの委譲
 
 ---
 
@@ -239,7 +239,7 @@ git rerere diff                            # 直近の自動適用差分
 
 - conflict 防止のためのブランチ運用 → `git-branch-flow`
 - コミットメッセージ規約 → `git-workflow`
-- 状況判断と委譲 → `git-orchestrator` agent
+- 状況判断と委譲 → `git-workflow` skill
 
 ---
 

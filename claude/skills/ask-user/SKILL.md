@@ -130,7 +130,7 @@ options:
   - 様子見 / 記録のみ — known-issues に記録するだけ
 ```
 
-### Pattern G: セッション遷移（session-manager 連携）
+### Pattern G: セッション遷移（task-tracker 連携）
 
 ```
 question: "現在の状態でどう進めますか？"
