@@ -97,7 +97,7 @@ refactor/dataservice-extract-cache
 | feature 作業の開始要求                                                                                                              | **3 段必須セット**: `git worktree add .claude/worktrees/<slug>/ -b <branch>` → `cd .claude/worktrees/<slug>/` → `echo <branch> > .claude/comm/.session-branch`（最後に `claude` 起動） |
 | 既存 feature branch を別チャットで触りたい                                                                                          | `git worktree add .claude/worktrees/<slug>/ <existing-branch>` → `cd` → `echo <existing-branch> > .claude/comm/.session-branch`                                                        |
 | 同一 branch を 2 つの worktree から触ろうとした                                                                                     | **停止**。git 仕様で禁止（`--force` は破損リスク）。branch 分割を提案                                                                                                                  |
-| `.session-branch` 未宣言で feature worktree 起動                                                                                    | （proactive 失敗時のフォールバック）`echo <branch> > .claude/comm/.session-branch` を促す。SessionStart hook 検査は `.session-branch` 存在時のみ動くため、未宣言だと無音スキップする   |
+| `.session-branch` 未宣言で feature worktree 起動                                                                                    | （proactive 失敗時のフォールバック）`echo <branch> > .claude/comm/.session-branch` を促す。名札が無いと担当 branch の突き合わせができないため、作成手順に組み込むのが正                |
 
 policy 不在のプロジェクトでは本節をスキップし §1 GitHub Flow に従う。
 

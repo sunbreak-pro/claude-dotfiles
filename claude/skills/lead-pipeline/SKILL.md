@@ -81,14 +81,14 @@ UserPromptSubmit hook (`~/.claude/hooks/pipeline-gate.mjs`) が実装系キー�
 プロジェクトの `CLAUDE.md` に "Multi-chat Worktree Policy" 節 (例: life-editor §7.4) がある場合、ティア判定の**前**に以下を確認する:
 
 1. **現在 main repo か worktree か** — `git rev-parse --show-toplevel` と `git branch --show-current` を読む
-2. **メインリポジトリで feature 作業を始めようとしていないか** — メイン (`/path/to/repo`) 上で `main` 以外のブランチに切り替えようとしている場合、停止して worktree 提案へ誘導。**4 ステップを 1 セットとして提示する**（途中省略禁止 — 特に step 3 の echo を抜くと検査 F が無音スキップする）:
+2. **メインリポジトリで feature 作業を始めようとしていないか** — メイン (`/path/to/repo`) 上で `main` 以外のブランチに切り替えようとしている場合、停止して worktree 提案へ誘導。**4 ステップを 1 セットとして提示する**（途中省略禁止 — 特に step 3 の echo を抜くと担当 branch の名札が残らない）:
    ```
    git worktree add .claude/worktrees/<slug>/ -b <new-branch>     # 1. 作業机を出す
    cd .claude/worktrees/<slug>/                                    # 2. その机に座る
    echo <new-branch> > .claude/comm/.session-branch                # 3. 担当バージョン名札を貼る ★必須
    claude                                                          # 4. （または別ターミナルで claude --worktree <slug>）
    ```
-3. **`.session-branch` 書き出しは ifガードではなく作成手順の一部** — 上記 step 3 を省略すると SessionStart hook 検査 F (`.claude/hooks/session-start-check.sh`) が opt-in で無音スキップされ、`pwd` の branch と宣言の不一致を見逃す。「未宣言なら促す」(reactive) ではなく「作成手順に組み込む」(proactive) が正
+3. **`.session-branch` 書き出しは ifガードではなく作成手順の一部** — 上記 step 3 を省略すると `.claude/comm/.session-branch` に担当 branch の宣言が残らず、`pwd` の branch と担当宣言の突き合わせができない。「未宣言なら促す」(reactive) ではなく「作成手順に組み込む」(proactive) が正
 
 引っ越しに例えると、メイン台所で別の家族の引っ越し作業を始めると混乱する。新規プロジェクトは別の部屋（worktree）に荷物を運んでから作業する。
 
