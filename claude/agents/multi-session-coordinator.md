@@ -30,12 +30,11 @@ permissionMode: default
 
 ### 役割の境界
 
-| エージェント                  | 担当範囲                                                                                                               |
-| ----------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| **multi-session-coordinator** | 並行チャット / サブエージェント群の俯瞰・整合性監視・並列起動プランの妥当性判断                                        |
-| session-manager               | 単一セッション内の状態管理（START/PAUSE/END）と既存スキル呼び出し                                                      |
-| task-tracker (skill)          | per-chat: memory/chat-\*.md + history/chat-\*.md + INDEX.md 再生成 / legacy: MEMORY.md + HISTORY.md のフォーマット維持 |
-| git-workflow (skill)          | branch / merge / rebase / push などの git 実操作                                                                       |
+| エージェント                  | 担当範囲                                                                                                                                                             |
+| ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **multi-session-coordinator** | 並行チャット / サブエージェント群の俯瞰・整合性監視・並列起動プランの妥当性判断                                                                                      |
+| task-tracker (skill)          | per-chat: memory/chat-\*.md + history/chat-\*.md + INDEX.md 再生成 / legacy: MEMORY.md + HISTORY.md のフォーマット維持 + 単一セッションの状態判定（START/PAUSE/END） |
+| git-workflow (skill)          | branch / merge / rebase / push などの git 実操作                                                                                                                     |
 
 本エージェントは「**監視と提案**」までで止め、実操作は他スキル・他エージェントに委ねる。
 
@@ -170,6 +169,36 @@ claude agents --json --cwd /path/to/repo
    - 複数チャットが同じ memory エントリ (per-chat または legacy) に紐づく作業
 5. 監視レポートを返す（実行はしない）
 ```
+
+## 公式機能との棲み分け（`claude --worktree` + `claude agents`）
+
+Claude Code v2.1.150 以降、CLI が worktree 作成 + 並行セッション管理を公式サポートする。旧 git オーケストレーター agent の廃止に伴い、その公式機能まわりの実測知見を本エージェントへ集約した。
+
+### `claude --worktree` の実測挙動（2026-05-24 検証）
+
+| 観点                       | 公式 docs / 事前研究   | 実測                                                                   |
+| -------------------------- | ---------------------- | ---------------------------------------------------------------------- |
+| branch 名                  | dir 名と同じ           | **`worktree-` prefix 自動付与**（dir=`wt-x` / branch=`worktree-wt-x`） |
+| auto-cleanup               | 変更なし終了で自動削除 | **発生せず**（dir + branch とも残る。手動 `git worktree remove` 必須） |
+| `--no-session-persistence` | session 永続化スキップ | worktree 永続化には影響なし                                            |
+
+`.worktreeinclude` で `.env` 等 gitignore 対象を worktree にコピー可能。**示唆**: 作成までは便利だが cleanup は自動で起きない前提で運用する（後始末の判定基準は git-branch-flow の cleanup 基準）。
+
+### `claude agents`（TUI / JSON）— Agent View
+
+Background sessions の一覧・状態取得。v2.1.139 以降は追加設定不要で自動有効。
+
+```bash
+claude agents                    # TUI ダッシュボード
+claude agents --json             # 全セッション JSON（[{pid, cwd, kind, startedAt, sessionId, name, status}]）
+claude agents --cwd /path --json # 特定 repo に絞る
+```
+
+`status` は `busy` / `waiting` / `idle`。worktree 活動判定（Layer 1）の根拠。
+
+### Agent Teams（experimental）— 現時点は採用見送り
+
+`CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` で有効化。lead + teammates の共有タスクリスト + mailbox 機構。既存の本エージェント + outbox + per-chat memory と概念重複、通信プロトコル手動編集禁止、token 乗算（3〜7 倍報告）等のため見送り。**Agent View だけ取り込み、Teams は使わない方針**。
 
 ## やってはいけないこと
 

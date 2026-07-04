@@ -1,4 +1,12 @@
+---
+paths:
+  - "**/skills/**"
+  - "**/skill-lib/**"
+---
+
 # Skill Management
+
+> path-scoped rule: スキル定義（`skills/` ・ `skill-lib/`）を扱う時のみ自動ロードされる（毎セッション常駐させない）。
 
 ## 一元管理ルール
 

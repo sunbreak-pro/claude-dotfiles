@@ -12,9 +12,9 @@ claude-dotfiles/
 │   ├── settings.json        # テンプレート（{{CLAUDE_DIR}} を install 時に実パス展開）
 │   ├── statusline-command.mjs
 │   ├── hooks/               # 全 hook（Node 製・クロスプラットフォーム）
-│   ├── rules/               # グローバルルール (10 ファイル)
-│   ├── agents/              # グローバルエージェント定義 (9 ファイル)
-│   ├── skills/              # グローバルスキル (16 個)
+│   ├── rules/               # グローバルルール (11 ファイル)
+│   ├── agents/              # グローバルエージェント定義 (7 ファイル)
+│   ├── skills/              # グローバルスキル (15 個)
 │   ├── docs/                # hooks_guide.md
 │   ├── output-styles/       # 口調 output style（tone-persona・常時有効化）
 │   └── templates/           # comm-protocol テンプレート

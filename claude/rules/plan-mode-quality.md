@@ -1,4 +1,11 @@
+---
+paths:
+  - "**/plans/**"
+---
+
 # Plan Mode Quality Guidelines
+
+> path-scoped rule: 計画書（`plans/` 配下）を保存・編集する時のみ自動ロードされる。plan mode の構想段階（ファイル未保存）では出ないため、計画を書き出す直前に効く想定。
 
 ## Plan Output Format
 
