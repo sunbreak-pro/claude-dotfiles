@@ -16,6 +16,7 @@ claude-dotfiles/
 │   ├── agents/              # グローバルエージェント定義 (7 ファイル)
 │   ├── skills/              # グローバルスキル (15 個)
 │   ├── docs/                # hooks_guide.md
+│   ├── output-styles/       # 口調 output style（tone-persona・常時有効化）
 │   └── templates/           # comm-protocol テンプレート
 ├── manifest.json            # リンク対象一覧（src → ~/.claude/<dest> + mode）
 ├── install.mjs              # インストーラ（symlink、失敗時 copy フォールバック）
@@ -25,25 +26,28 @@ claude-dotfiles/
 
 ## 共有対象
 
-| ~/.claude/ 内                                     | mode         | 備考                                                        |
-| ------------------------------------------------- | ------------ | ----------------------------------------------------------- |
-| `CLAUDE.md`                                       | link         | グローバル指示                                              |
-| `settings.json`                                   | **template** | `{{CLAUDE_DIR}}` を実パスに展開してコピー（symlink しない） |
-| `statusline-command.mjs`                          | link         | 旧 `statusline-command.sh` の Node 移植                     |
-| `hooks/`                                          | link         | 旧 inline sh+jq hook 群の Node 移植（下表参照）             |
-| `rules/` `agents/` `skills/` `docs/` `templates/` | link         | ディレクトリごと symlink                                    |
+| ~/.claude/ 内                                                      | mode         | 備考                                                        |
+| ------------------------------------------------------------------ | ------------ | ----------------------------------------------------------- |
+| `CLAUDE.md`                                                        | link         | グローバル指示                                              |
+| `settings.json`                                                    | **template** | `{{CLAUDE_DIR}}` を実パスに展開してコピー（symlink しない） |
+| `statusline-command.mjs`                                           | link         | 旧 `statusline-command.sh` の Node 移植                     |
+| `hooks/`                                                           | link         | 旧 inline sh+jq hook 群の Node 移植（下表参照）             |
+| `rules/` `agents/` `skills/` `docs/` `output-styles/` `templates/` | link         | ディレクトリごと symlink                                    |
 
 ### hooks 一覧（旧 → 新）
 
-| hook イベント                  | 旧実装                                   | 新実装                                                                            |
-| ------------------------------ | ---------------------------------------- | --------------------------------------------------------------------------------- |
-| UserPromptSubmit               | inline sh+jq+grep ゲート                 | `hooks/pipeline-gate.mjs`（実装系 + ultracode 検出で采配注入。旧 2 ゲートを統合） |
-| PostToolUse (Edit\|Write)      | inline sh+jq → prettier                  | `hooks/post-edit-prettier.mjs`                                                    |
-| PreToolUse (Edit\|Write\|Read) | inline sh+jq 秘匿ファイルブロック        | `hooks/protect-files.mjs`                                                         |
-| PreToolUse (Skill)             | inline sh+jq スキル起動宣言              | `hooks/skill-launch-notice.mjs`                                                   |
-| SessionStart / Stop            | `sui-memory recall/save` 直叩き          | `hooks/sui-memory.mjs`（バイナリが無いマシンでは no-op）                          |
-| Notification                   | `osascript`                              | `hooks/notify.mjs`（mac=osascript / win=PowerShell toast）                        |
-| statusLine                     | `statusline-command.sh` (sh+jq+awk+perl) | `statusline-command.mjs`                                                          |
+| hook イベント                  | 旧実装                                     | 新実装                                                                               |
+| ------------------------------ | ------------------------------------------ | ------------------------------------------------------------------------------------ |
+| UserPromptSubmit               | `hooks/lead-pipeline-gate.sh` (sh+jq+grep) | `hooks/lead-pipeline-gate.mjs`                                                       |
+| UserPromptSubmit               | —（新設）                                  | `hooks/ultracode-gate.mjs`（ultracode 検出で並列采配注入）                           |
+| PostToolUse (Edit\|Write)      | inline sh+jq → prettier                    | `hooks/post-edit-prettier.mjs`                                                       |
+| PostToolUse (Edit\|Write)      | —（新設）                                  | `hooks/adversarial-review-gate.mjs record`（変更ファイルを session ごとに記録）      |
+| PreToolUse (Edit\|Write\|Read) | inline sh+jq 秘匿ファイルブロック          | `hooks/protect-files.mjs`                                                            |
+| PreToolUse (Skill)             | inline sh+jq スキル起動宣言                | `hooks/skill-launch-notice.mjs`                                                      |
+| SessionStart / Stop            | `sui-memory recall/save` 直叩き            | `hooks/sui-memory.mjs`（バイナリが無いマシンでは no-op）                             |
+| Stop                           | —（新設）                                  | `hooks/adversarial-review-gate.mjs check`（未レビューのコード変更を 1 度だけゲート） |
+| Notification                   | `osascript`                                | `hooks/notify.mjs`（mac=osascript / win=PowerShell toast）                           |
+| statusLine                     | `statusline-command.sh` (sh+jq+awk+perl)   | `statusline-command.mjs`                                                             |
 
 ## インストール
 

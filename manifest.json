@@ -17,6 +17,11 @@
     { "src": "claude/agents", "dest": "agents", "mode": "link" },
     { "src": "claude/skills", "dest": "skills", "mode": "link" },
     { "src": "claude/docs", "dest": "docs", "mode": "link" },
+    {
+      "src": "claude/output-styles",
+      "dest": "output-styles",
+      "mode": "link"
+    },
     { "src": "claude/templates", "dest": "templates", "mode": "link" }
   ]
 }
