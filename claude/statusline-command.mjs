@@ -76,11 +76,12 @@ function usageSegment(label, pct) {
   if (pct === undefined || pct === null || !Number.isFinite(n) || n < 0) {
     return `${C_DIM}${label} ${"░".repeat(BAR_WIDTH)} –${R}`;
   }
-  const clamped = Math.min(100, n);
-  const filled = Math.round((clamped / 100) * BAR_WIDTH);
+  // round first so the shown %, the bar, and the color grade always agree
+  const shown = Math.round(Math.min(100, n));
+  const filled = Math.round((shown / 100) * BAR_WIDTH);
   const bar = "█".repeat(filled) + "░".repeat(BAR_WIDTH - filled);
-  const color = gradeColor(clamped);
-  return `${C_SEP}${label}${R} ${color}${bar} ${Math.round(n)}%${R}`;
+  const color = gradeColor(shown);
+  return `${C_SEP}${label}${R} ${color}${bar} ${shown}%${R}`;
 }
 
 const segments = [usageSegment("ctx", input.context_window?.used_percentage)];
