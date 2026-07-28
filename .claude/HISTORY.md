@@ -1,5 +1,19 @@
 # HISTORY.md - 変更履歴
 
+### 2026-07-28 - Loop Engineering ハーネス設計（判断の非同期化ロードマップ）
+
+#### 概要
+
+life-editor の chat-main + 複数 worktree 運用を、段階的に自律型へ近づける 4 Phase ロードマップを設計し、life-editor 側に計画書 `C:\Users\user\orca\life-editor\.claude\docs\vision\plans\2026-07-28-loop-engineering-harness.md` を作成した（ユーザー指示によりファイル作成のみ・life-editor への git 操作なし）。現状実測（memory/INDEX・automation/・comm/）+ 公式ドキュメント + 実践者事例の 2 系統調査（claude-code-guide / deep-web-research）に基づく。
+
+#### 変更点
+
+- **現状診断**: 詰まりは (1) 判断の同期処理化（merge / 仕様判断 / 実機目視がユーザー手番に積滞 — 6 月分の実機目視が残存）(2) ユーザーの人間ルーター化（boot 行貼付・outbox 運搬・起票依頼の一括消化）(3) 疲労時の判断劣化（判断が選択肢化されず 20+ 件のリストで届く）。既存の自律ルーチン設計（automation/ 2026-05-26 の夜 22 時 + 朝 6 時構成）は Mac 時代の Cloud Routine 前提のまま未稼働（routine-ids.md PENDING）と実測で判明
+- **4 Phase ロードマップ**: Phase 0 判断の非同期化（decisions/ キュー + POLICY 事前決裁 + dev-digest 采配ダイジェスト・朝刊統合）→ Phase 1 夜間安全レーン（docs・整理・検証準備のみ。ユーザー決定 2026-07-28）→ Phase 2 実装自走（draft PR 止まり）→ Phase 3 playwright 検証自動化。merge と不可逆操作は全 Phase で人間ゲートを恒久維持
+- **Phase 0 実装仕様を計画書へ全文埋め込み**: decisions/README（単一書込者原則・エントリ/回答形式）・POLICY P-001〜P-007（実際の裁定事例 #429/#367/#428 から seed）・rules/decision-queue.md・skills/dev-digest/SKILL.md（要判断は最大 5 件の認知負荷キャップ）・.gitignore 追記の 5 点。life-editor 側チャットがコピー配置すれば完成する形
+- **調査反映のガードレール**: 反復 cap の独立計測（公式 ralph-wiggum の cap 無視 494 回暴走事例 #18646）/ スコープ制約のプロンプト明記 / ログのファイル退避（context 枯渇でルール要約劣化）/ 30-60 分の独立セッション分割 / 承認キューは「信頼して監視が緩んだ頃」が最危険 → 不可逆は恒久同期ゲート / 無人時は AskUserQuestion 不可 → キューが唯一の質問経路 / scheduled tasks の 7 日 expire は台帳管理（routine-ids.md 流用）
+- **朝刊統合の前提を明記**: life-editor MCP（Supabase 版）は疎通未検証のため、digest はファイル正本 + MCP 任意ミラーの degrade 設計。疎通確認は chat-main の既存予定タスク
+
 ### 2026-07-28 - Opus 5 向けハーネス調整 第 2 弾（レビューゲート絞り込み / rules 実態整合 / effort 見直し）
 
 #### 概要
