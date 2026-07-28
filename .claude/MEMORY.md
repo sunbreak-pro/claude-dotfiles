@@ -6,9 +6,9 @@
 
 ## 直近の完了
 
+- Loop Engineering ハーネス設計（判断非同期化の 4 Phase ロードマップ。life-editor 側に計画書 `2026-07-28-loop-engineering-harness.md` を作成 — 指示によりファイル作成のみ・git 操作なし） ✅（2026-07-28）
 - Opus 5 向けハーネス調整 第 2 弾（レビューゲート発火条件の絞り込み / rules の実態整合 / サブエージェント effort 見直し） ✅（2026-07-28）
 - Opus 5 向けハーネス調整 第 1 弾（出力長規定の新設 / session-verifier Gate 5・6 統合） ✅（2026-07-27）
-- statusline 新 3 行デザイン（使用率バー / model+effort / 場所情報） ✅（2026-07-12）
 
 ## 予定
 
