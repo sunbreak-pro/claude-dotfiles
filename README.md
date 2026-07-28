@@ -40,7 +40,7 @@ claude-dotfiles/
 | ------------------------------ | ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------- |
 | UserPromptSubmit               | `hooks/lead-pipeline-gate.sh` (sh+jq+grep) | `hooks/pipeline-gate.mjs`（lead-pipeline のティア判定＋ultracode 検出時の並列采配注入を 1 本で排他処理・二重注入なし） |
 | PostToolUse (Edit\|Write)      | inline sh+jq → prettier                    | `hooks/post-edit-prettier.mjs`                                                                                         |
-| PostToolUse (Edit\|Write)      | —（新設）                                  | `hooks/adversarial-review-gate.mjs record`（変更ファイルを session ごとに記録）                                        |
+| PostToolUse (Edit\|Write)      | —（新設）                                  | `hooks/adversarial-review-gate.mjs record`（コード / 秘密情報 / 実行環境定義の変更のみ session ごとに記録）            |
 | PreToolUse (Edit\|Write\|Read) | inline sh+jq 秘匿ファイルブロック          | `hooks/protect-files.mjs`                                                                                              |
 | PreToolUse (Skill)             | inline sh+jq スキル起動宣言                | `hooks/skill-launch-notice.mjs`                                                                                        |
 | SessionStart / Stop            | `sui-memory recall/save` 直叩き            | `hooks/sui-memory.mjs`（バイナリが無いマシンでは no-op）                                                               |

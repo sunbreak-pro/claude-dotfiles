@@ -6,3 +6,5 @@
 - **sui-memory はセッション横断の自動要約のみ**（`recall` / `save`）。ユーザー嗜好・長期文脈の想起に使う。
 - **sui-memory save にタスクの詳細進捗を書かせない**（task-tracker の領分。二重管理を避ける）。
 - **recall 結果が task-tracker の記録と矛盾したら task-tracker を優先**する。
+
+現状この機械に sui-memory は未インストール（`~/dev/Claude/sui-memory` が無く `hooks/sui-memory.mjs` は no-op で素通りする）。よって recall / save は実際には何もしていない。上の境界はインストールした場合に効く。

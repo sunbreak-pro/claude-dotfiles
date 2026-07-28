@@ -18,7 +18,7 @@ description: >
 
   **重要**: 本エージェントは結果をメインチャットに返す。次フェーズ（role-engineer / role-qa）の起動はメインチャットが Agent ツールで行う。本エージェントから直接 role-engineer を呼ばない（サブエージェントの再帰呼び出しを避けるため）。
 model: opus
-effort: xhigh
+effort: high
 tools: [Read, Glob, Grep, Skill, Bash]
 permissionMode: default
 skills:

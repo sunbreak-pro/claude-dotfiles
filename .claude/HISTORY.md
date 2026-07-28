@@ -1,5 +1,23 @@
 # HISTORY.md - 変更履歴
 
+### 2026-07-28 - Opus 5 向けハーネス調整 第 2 弾（レビューゲート絞り込み / rules 実態整合 / effort 見直し）
+
+#### 概要
+
+第 1 弾に続き、Opus 5 の自己検証を前提に「過干渉」側の設定を削った。最大の負荷源だった adversarial-review-gate（`.md` 1 行修正でも Stop でブロックし opus/xhigh のサブエージェント監査を要求していた）をコード変更に限定し、あわせて実態と食い違っていた rules の記述と、メインより高くなっていたサブエージェントの effort を直した。
+
+#### 変更点
+
+- **hooks/adversarial-review-gate.mjs**: `needsReview()` を新設し、記録対象をコード拡張子（`.ts` / `.mjs` / `.py` / `.rs` / `.sh` / `.sql` 等）・秘密情報を持つファイル（`.env*` / `*.pem` / `*.key` / `id_rsa` 等）・実行環境定義（`Dockerfile` / `docker-compose*.yml` / `.github/workflows/*.yml`）に限定。ファイル名ベースの `auth` / `token` 等の判定は意図的に置いていない（コードは拡張子で拾えるうえ、置くと `skills/session-verifier/SKILL.md` のような無関係な `.md` まで巻き込むため）。docs / 設定のみのセッションは記録ゼロとなり Stop で止まらない。record → check を実データで流し、docs のみの回が exit 0 で無言通過、コード込みの回のみ exit 2 になることを確認済み
+- **rules/agent-management.md**: 「実体は `~/dev/Claude/agents-lib/` で一元管理し `~/.claude/agents/` にはシンボリックリンクのみ配置」という章を削除し、実態（リポジトリ `claude/agents/` にフラット直置き、`~/.claude/agents` はディレクトリごと 1 本のリンク）に書き換え。カテゴリ構造・`AGENT_INDEX.md`・Archive 運用など存在しない仕組みの記述を削除し、新規作成手順からリンク作成・インデックス更新の 2 ステップを除去。`paths:` からも `**/agents-lib/**` を削除。README:93 が既に「Mac 時代の symlink ファーム運用の名残で、以後の SSOT は本 repo」と記載していたのに rules 側だけ追随していなかったもの
+- **rules/skill-management.md**: 上と同じ実態不一致を修正。あわせて「組み込みスキルは実体を持たない」節を新設し、`security-review` のような Claude Code 組み込みスキルが `skills/` にディレクトリを持たなくても frontmatter の `skills:` から解決されることを明記（実体が無いのを壊れた参照と誤判定しないため）。「削除前の確認義務」を agent-management と揃えて追加
+- **rules/agent-management.md（effort/model 設定方針）**: 「子の effort はメインチャットを超えさせないのが基本。例外は見落としのコストが高い監査系のみ」を明文化。旧「オーケストレーター型は一律 xhigh」を廃止。第 1 弾で追加した Fable 5 非割り当ての記述を本節に集約
+- **agents/role-pm.md・agents/multi-session-coordinator.md**: `effort: xhigh` → `high`。メイン（`settings.json` の `effortLevel: high`）との逆転を解消。role-qa と security-reviewer は監査系として `xhigh` を維持
+- **agents/multi-session-coordinator.md（description）**: 共有資源の列挙にあった `agents-lib` / `skill-lib` を実在する `claude/agents`・`claude/skills` に修正
+- **rules/tone.md**: 「vocab を過信しない」節が参照していた語彙ログ `~/dev/Claude/sui-memory` はこの機械に存在しないため、パス参照を外して「使われた用語＝理解済み、とみなさない」に改題。原則（会話に出た専門用語でも当然視せず噛み砕く）はそのまま維持
+- **rules/memory-boundary.md**: sui-memory が未インストールで `hooks/sui-memory.mjs` が no-op のため recall / save が実際には何もしていない旨を注記。境界の定義自体はインストール時に効くものとして残置
+- **README.md**: hooks 表の adversarial-review-gate record 行を、絞り込み後の対象（コード / 秘密情報 / 実行環境定義）に追随
+
 ### 2026-07-27 - Opus 5 向けハーネス調整 第 1 弾（出力長規定 / session-verifier 軽量化）
 
 #### 概要
