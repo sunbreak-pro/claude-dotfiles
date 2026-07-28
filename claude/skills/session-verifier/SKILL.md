@@ -1,6 +1,6 @@
 ---
 name: session-verifier
-description: Pre-commit quality gate that actively runs verification tools and fixes issues after completing a section of work. Runs type checking, linting, tests, structural review, and bug pattern analysis on changed files. Use before /task-tracker to ensure code quality before committing. Triggers include "session-verifier", "verify", "quality check", "pre-commit check", "check my work", "品質チェック", "検証", "セッション検証".
+description: Pre-commit quality gate that actively runs verification tools and fixes issues after completing a section of work. Runs type checking, linting, tests, and project-specific consistency checks on changed files. Use before /task-tracker to ensure code quality before committing. Triggers include "session-verifier", "verify", "quality check", "pre-commit check", "check my work", "品質チェック", "検証", "セッション検証".
 ---
 
 MANDATORY FIRST ACTION: Output `<The session-verifier will launch>` before doing anything else.
@@ -16,7 +16,7 @@ MANDATORY FIRST ACTION: Output `<The session-verifier will launch>` before doing
 
 ```
 Gate 0 (Scope) → Gate 1 (Types) → Gate 2 (Lint) → Gate 3 (Tests)
-→ Gate 4 (Coverage) → Gate 5 (Structural) → Gate 6 (Bug Scan) → Verdict
+→ Gate 4 (Coverage) → Gate 5 (Project Rules) → Verdict
 ```
 
 各ゲート: チェック実行 → 合格? → 次へ : 修正 → 再実行 → 合格? → 次へ : BLOCKING報告
@@ -53,7 +53,8 @@ Gate 0 (Scope) → Gate 1 (Types) → Gate 2 (Lint) → Gate 3 (Tests)
 3. GATE: 変更ファイルにlintエラー 0件?
    - Yes → 次のゲートへ
    - No → `--fix` オプションで自動修正を適用、残りは手動修正
-4. 2回リトライしても失敗 → BLOCKING finding として記録
+4. デバッグ出力の検出ルール（`no-console` 等）が lint 設定に無い場合のみ、変更ファイルに残ったデバッグ出力を finding として 1 度報告し、恒久対処として lint ルールの追加を提案する。毎回のチェックリスト化はしない（`no-console` は `eslint:recommended` に含まれないため、設定していないプロジェクトではどの層も拾わない）
+5. 2回リトライしても失敗 → BLOCKING finding として記録
 
 ## Gate 3: Existing Tests
 
@@ -88,54 +89,23 @@ Gate 0 (Scope) → Gate 1 (Types) → Gate 2 (Lint) → Gate 3 (Tests)
    - 単純なラッパー
 6. **1回の verify で最大3ファイルまで**テストを作成する（コンテキスト節約）
 
-## Gate 5: Structural Review
+## Gate 5: Project Rules（プロジェクト固有ルールの整合）
 
-CLAUDE.md と `.claude/docs/vision/coding-principles.md` のプロジェクト固有ルールを適用する（必要に応じて読み込み）。
-**変更ファイルに該当するチェックのみ実行する。**
+汎用的なバグ検出・コード品質チェックはここで手順化しない。モデルが実装しながら自律的に見る領域で、チェックリストとして読ませても精度は上がらず過剰検証になるだけ。
 
-### プロジェクト固有チェック（CLAUDE.md に記載されたルールを適用、該当ファイルが変更された場合のみ）:
+ここで確認するのは **CLAUDE.md と `.claude/docs/vision/coding-principles.md` に明文化された、そのプロジェクト固有の規約のみ**。モデルが事前に知りようがない情報なので、ここだけは明示的に見る。**変更ファイルに該当する項目だけ**を対象にする。
 
-CLAUDE.md の「Development Workflows」「Coding Standards」章に記載された項目を変更ファイル基準で確認する。一般的なチェック項目:
+1. 変更ファイルに関係する章（「Development Workflows」「Coding Standards」等）を読む
+2. **多点同期**が要る箇所が変更されていたら、対になるファイルも更新されているか確認する。よくある対象:
+   - IPC / API 境界（送信側・受信側・型定義）
+   - DataService / Repository のインターフェース変更 → 実装とモック
+   - DB migration → IF NOT EXISTS / バージョンインクリメント
+   - 新規 UI テキスト → 全ロケールファイル
+3. `.claude/docs/known-issues/INDEX.md` に該当する既知パターンがないか確認する
 
-- **IPC 多点同期**: プロジェクトが定義する IPC 境界ファイルが変更 → 整合性を確認（CLAUDE.md の該当節参照）
-- **DataService / Repository 層整合**: インターフェース変更時は実装・モックも更新されているか
-- **Provider / Context 順序**: Context 関連ファイル変更時は依存順序を確認
-- **Context Pattern A**: 新規 context → 3 ファイル構成確認（定められたパターンがある場合）
-- **DB migration**: マイグレーションファイル変更時は IF NOT EXISTS / バージョンインクリメント確認
-- **i18n**: 新規 UI テキスト → 全ロケールファイル追加確認
+GATE: 固有ルール違反なし? → 違反があれば修正、判断が要るものは finding として報告
 
-### 汎用チェック（全プロジェクト共通）:
-
-- 新規 export が実際に使用されている
-- `console.log` が本番コードに残っていない（テストファイルは許可）
-- コメントアウトされたコードブロックがない
-- 意味のある TODO/FIXME にはコンテキストが付記されている
-
-GATE: 全チェック合格? → 問題があれば修正して再確認
-
-## Gate 6: Bug Pattern Scan
-
-変更コードを手動分析し、高リスクパターンを検出する:
-
-### React:
-
-- useEffect/useCallback の依存配列の欠落・古い参照
-- レンダーパス内の setState（無限ループリスク）
-- クリーンアップ/abort なしの非同期操作
-- リスト内の key prop 欠落
-
-### TypeScript:
-
-- `as` 型アサーションが実際の型不一致を隠蔽
-- オプショナルチェーンがバグを隠す（`a?.b?.c` が黙って undefined）
-- `any` 型が具体的な型で置き換え可能
-
-### State管理:
-
-- 配列/オブジェクトの直接 mutation
-- 並行非同期操作の競合状態
-
-GATE: 高リスクパターンなし? → 問題があれば修正または finding として報告
+プロジェクト固有ルールが定義されていないプロジェクトではスキップする。
 
 ## Verdict
 
@@ -151,9 +121,8 @@ GATE: 高リスクパターンなし? → 問題があれば修正または find
 | Types | ✅/❌ | 詳細 |
 | Lint | ✅/❌ | 詳細 |
 | Tests | ✅/❌/⏭️ | 詳細 |
-| Coverage | ✅/❌ | N new tests written |
-| Structural | ✅/❌/⏭️ | 詳細 |
-| Bug Scan | ✅/❌ | 詳細 |
+| Coverage | ✅/❌/⏭️ | N new tests written |
+| Project Rules | ✅/❌/⏭️ | 詳細 |
 
 **Actions Taken**:
 - (修正、テスト追加等のアクション一覧)
@@ -166,7 +135,8 @@ GATE: 高リスクパターンなし? → 問題があれば修正または find
 
 ## ルール
 
-- Gate 1-3（自動チェック）はスキップ不可。Gate 4-6 は軽微な変更（typo修正、コメントのみ）の場合に省略可
+- Gate 1-3（自動チェック）はスキップ不可。Gate 4-5 は軽微な変更（typo修正、コメントのみ）の場合に省略可
+- **汎用バグ検出・一般的なコード品質チェックを手順として書き足さない**。モデルが自律的に行う領域で、チェックリスト化すると過剰検証になり遅くなる。本スキルの主務は「決定論的ツールの実行（Gate 1-3）」と「モデルが知りようがないプロジェクト固有規約の確認（Gate 5）」の 2 つ
 - 問題を報告するだけでなく、可能な限り実際に修正する
 - 全分析を変更ファイルに限定する。コードベース全体をレビューしない
 - 修正が新たな変更を生んだ場合、その変更もゲートを通す（ただし再帰は1段階まで）
