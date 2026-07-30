@@ -54,7 +54,10 @@ description: 外来の実装タスクを受けた瞬間に、軽重ティアを�
        └─ 観点独立なら security-reviewer / life-editor 系 validator を role-qa と並列起動可
 6. task-tracker (skill, END)              ← MEMORY/HISTORY 詳細記録 + plan archive + commit
 7. git-workflow (skill)                   ← branch 保護判定。PR は git-branch-flow へ
+8. PR マージ                              ← role-qa 通過済 + conflict 無しなら確認不要で自動実行
 ```
+
+> 重ティアはチェーンが 5 の role-qa を通るため、そこを Blocking ゼロで抜けて conflict も無ければ 8 はユーザー確認を挟まない（git-workflow §0.1.1）。軽 / 中ティアで PR を出す場合は、8 の直前に role-qa を 1 回だけ起動して同じ条件を満たしてから自動マージする（起動可否をユーザーに聞かない）。
 
 ### 並列化の判断
 
