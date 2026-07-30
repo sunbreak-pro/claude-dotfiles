@@ -261,6 +261,18 @@ gh pr merge <PR#> --merge --delete-branch
 
 `--delete-branch` で merge 後の feature branch 自動削除（推奨）。
 
+### 自動マージ（既定・2026-07-29 ユーザー指定）
+
+PR 作成後のマージはユーザー確認を挟まず実行する。条件と例外は `git-workflow` §0.1.1 が正本（conflict 無し + role-qa 通過の 2 点）。手順:
+
+```bash
+gh pr view <PR#> --json mergeable,mergeStateStatus,statusCheckRollup   # 1. conflict 判定
+gh pr merge <PR#> --squash --delete-branch                             # 2. 条件を満たせば即実行
+git checkout main && git pull --rebase origin main                     # 3. §7 のクリーンアップ
+```
+
+`mergeable` が `CONFLICTING` / `UNKNOWN`（判定中）なら自動マージしない。`UNKNOWN` は GitHub 側の計算待ちなので数秒おいて 1 回だけ再取得し、それでも確定しなければユーザーに報告して止まる。
+
 ---
 
 ## 7. マージ後のクリーンアップ
