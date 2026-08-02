@@ -19,6 +19,10 @@
           {
             "type": "command",
             "command": "node {{CLAUDE_DIR}}/hooks/pipeline-gate.mjs"
+          },
+          {
+            "type": "command",
+            "command": "node {{CLAUDE_DIR}}/hooks/graphify-nudge.mjs"
           }
         ]
       }
@@ -30,10 +34,6 @@
           {
             "type": "command",
             "command": "node {{CLAUDE_DIR}}/hooks/post-edit-prettier.mjs"
-          },
-          {
-            "type": "command",
-            "command": "node {{CLAUDE_DIR}}/hooks/adversarial-review-gate.mjs record"
           }
         ]
       }
@@ -74,10 +74,6 @@
       {
         "matcher": "",
         "hooks": [
-          {
-            "type": "command",
-            "command": "node {{CLAUDE_DIR}}/hooks/adversarial-review-gate.mjs check"
-          },
           {
             "type": "command",
             "command": "node {{CLAUDE_DIR}}/hooks/sui-memory.mjs save",
