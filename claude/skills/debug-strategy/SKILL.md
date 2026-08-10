@@ -3,8 +3,6 @@ name: debug-strategy
 description: Systematic debugging methodology for identifying and fixing bugs. Use when investigating errors, unexpected behavior, failing tests, or any debugging task. Triggers include bug reports, error messages, stack traces, test failures, performance issues, and requests to diagnose problems in React, TypeScript, Node.js, or Electron applications.
 ---
 
-MANDATORY FIRST ACTION: Output `<The debug-strategy will launch>` before doing anything else.
-
 # Debug Strategy
 
 Systematic approach: Reproduce, Trace, Isolate, Fix.

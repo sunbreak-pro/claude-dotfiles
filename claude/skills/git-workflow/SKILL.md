@@ -3,8 +3,6 @@ name: git-workflow
 description: Git operation conventions, commit message rules, and destructive command guardrails. Use as the SSOT for any git command — commit, push, branch, merge, rebase, PR, force-push, conflict, or git-related error messages. For branch strategy / PR / merge-rebase-squash judgment use git-branch-flow. For conflict triage use git-conflict-resolver.
 ---
 
-MANDATORY FIRST ACTION: Output `<The git-workflow will launch>` before doing anything else.
-
 # Git Workflow — SSOT
 
 このスキルは git 操作の **規約と安全則の参照書** です。手順カタログは別スキルに分離しています。
@@ -39,7 +37,10 @@ MANDATORY FIRST ACTION: Output `<The git-workflow will launch>` before doing any
 | `--force-with-lease`（保護 ref）   | **ブロック**                                |
 | conflict                           | 解析・提案のみ。編集はユーザー OK 後        |
 
-### 0.1.1 PR の自動マージ（2026-07-29 ユーザー指定・全プロジェクト共通）
+### 0.1.1 PR の自動マージ（2026-07-29 ユーザー指定・全プロジェクト共通の既定）
+
+> **本節が自動マージ可否の正本**。git-branch-flow §6 / lead-pipeline は判定をここへ委譲し、手順だけを持つ。
+> **プロジェクト側の POLICY / CLAUDE.md による override が常に優先**する（例: life-editor は POLICY P-001「merge と main への取り込みは常にユーザー」で本節を不適用 = D-20260806-main-1。`gh pr merge` が `permissions.ask` に入っている場合も同じ扱い）。
 
 PR を作った後のマージは**ユーザー確認を挟まず自動で実行する**。ただし次の 2 つを満たすときだけ。片方でも欠けたら従来どおり停止して報告し、ユーザーの判断を仰ぐ。
 
@@ -51,6 +52,7 @@ PR を作った後のマージは**ユーザー確認を挟まず自動で実行
 補足:
 
 - **role-qa 未実施のまま止まらない**。マージ段階で監査を通していなければ、ユーザーに確認せずその場で role-qa を Agent ツールで起動し、Blocking ゼロを確認してからマージまで進める。「レビューしていいですか」と聞くために止まるのは本節の趣旨に反する。
+- `mergeable` が `CONFLICTING` なら自動マージしない。`UNKNOWN`（GitHub 側の計算待ち）は数秒おいて **1 回だけ**再取得し、それでも確定しなければユーザーに報告して止まる。
 - 停止して確認を仰ぐのは、role-qa が Blocking を出したときと conflict のときだけ。
 - CI / status check は自動マージの必須条件にしない（ユーザー指定）。ただし赤いチェックに気づいたら黙って流さず、マージ後にその事実を報告する。
 - マージ手順とマージ方式の選択は `git-branch-flow` §6 に従う（既定は `gh pr merge <PR#> --squash --delete-branch`）。

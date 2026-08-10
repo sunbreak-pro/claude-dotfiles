@@ -1,3 +1,8 @@
+---
+name: code-plan-editor
+description: Implementation plan lifecycle manager integrated with Plan mode. Pre-Plan preparation (context injection, existing plan scan) and Post-Plan reconciliation (converting Plan mode output into a structured plan file). Resolves the project's own plans/_TEMPLATE.md first, falls back to the built-in template. Triggers include "計画書", "実装計画", "implementation plan", "plan mode", "プラン作成", "計画の続き".
+---
+
 # Skill: code-plan-editor
 
 ## Description
@@ -12,6 +17,13 @@ Implementation plan lifecycle manager integrated with Plan mode. Provides Pre-Pl
 - When user asks to check or resume existing plans
 
 ## Path Resolution
+
+### Template (which plan format to use)
+
+1. Project has `.claude/docs/vision/plans/_TEMPLATE.md` → **that file is authoritative** for this project (read it and follow its sections / Status vocabulary / Scope and Gate requirements)
+2. Otherwise → fall back to the built-in `references/plan-template.md`
+
+Never overwrite a project's `_TEMPLATE.md` with the built-in one.
 
 ### Plan Directory (saving new plans)
 
@@ -41,7 +53,7 @@ Check in order; use the first match:
 Run **before** entering Plan mode to set context and avoid duplicate work.
 
 1. **Scan existing plans**:
-   - Check `<plan-dir>/*.md` for any `in-progress` plans
+   - Check `<plan-dir>/*.md` for any `IN PROGRESS` plans
    - Check `<archive-dir>/*.md` for recently completed related plans
    - If in-progress plans exist, list them with titles and ask:
      - Resume an existing plan? → Load it and skip Plan mode
@@ -56,7 +68,7 @@ Run **before** entering Plan mode to set context and avoid duplicate work.
 3. **Inject template context**:
    - Read `references/plan-template.md` from this skill's directory
    - Summarize the template structure to the user so Plan mode output aligns
-   - Advise: "Plan mode では以下のセクションを含めてください: Context, Steps (チェックボックス付き), Files (テーブル形式), Verification"
+   - Advise: "Plan mode では以下のセクションを含めてください: Context, 検討した代替案 (表), Scope (触ってよいパス), Steps (チェックボックス付き), Files (テーブル形式), Verification"
 
 4. **Suggest related past plans**:
    - If archive contains plans touching similar files or topics, mention them as reference
@@ -89,7 +101,7 @@ Run **after** exiting Plan mode to capture and convert the plan output.
      - Implementation steps → `## Steps` (add `[ ]` checkboxes, flatten nesting)
      - File references → `## Files` (table format with operation type)
      - Testing notes → `## Verification` (add `[ ]` checkboxes)
-   - Add metadata: Status (`in-progress`), Created (today), Task, Project
+   - Add metadata: Status (`IN PROGRESS`), Created (today), Task, Project
 
 3. **Fill missing sections**:
    - No Context → synthesize from goal statement and steps
@@ -122,12 +134,7 @@ As steps are completed during implementation:
 
 ### 4. Completing a Plan
 
-When all steps are done or user explicitly marks completion:
-
-1. Update the plan's Status to `completed`
-2. Resolve the archive directory using Path Resolution above
-3. Move the file from the plan directory to the archive directory (use `mv` command)
-4. Confirm archival to the user
+**Executor = `task-tracker` (END flow).** This skill does not archive plans itself — it only reads plan state. When all steps are done, hand off to `/task-tracker`, which updates the Status, writes the divergence review into the plan's Worklog, and moves the file to the archive directory.
 
 ## Rules
 
@@ -135,7 +142,7 @@ When all steps are done or user explicitly marks completion:
 - Slug should be lowercase, hyphen-separated, derived from the plan title (max 50 chars)
 - When creating a plan from Plan mode output, preserve all steps and file lists faithfully
 - Do not auto-complete steps — only mark as done after actual implementation
-- Ask the user before archiving a plan to history
+- Archiving a completed plan is `task-tracker`'s job (END flow) — this skill only proposes the handoff
 - The **Task** field links the plan to a MEMORY.md task entry; leave blank if no task association
 - Use `mv` (Bash) to move files between directories, not Edit
 - **Pre-Plan は Plan mode の前に実行すること**（既存計画の重複防止とコンテキスト注入のため）

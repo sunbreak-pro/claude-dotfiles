@@ -3,8 +3,6 @@ name: git-conflict-resolver
 description: Analyze merge / rebase conflicts and propose resolution strategy. Reads both sides, classifies the conflict type (logic / lockfile / generated / formatting), and presents a recommended merge for each file. Does NOT auto-resolve — user confirmation is mandatory before any edit. Triggers include "conflict", "コンフリクト", "競合", "CONFLICT (content)", "Automatic merge failed", "merge conflict", "rebase conflict", git status showing "Unmerged paths".
 ---
 
-MANDATORY FIRST ACTION: Output `<The git-conflict-resolver will launch>` before doing anything else.
-
 # Git Conflict Resolver — 解析と提案専用
 
 このスキルは **conflict を解析して提案するだけ**。実際の編集はユーザー確認後に行う。
@@ -127,11 +125,7 @@ const timeout = 10000;
 
 → base を起点に「ours が +2000」「theirs が +7000」と読める。両側が同じ意図（タイムアウト緩和）なら theirs（10000）採用が妥当、と推論できる。
 
-設定推奨（git-workflow §5.1）:
-
-```bash
-git config --global merge.conflictstyle zdiff3
-```
+未設定なら `git-workflow` §5.1（推奨設定）の手順で有効化する。
 
 ---
 

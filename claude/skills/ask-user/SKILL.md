@@ -3,8 +3,6 @@ name: ask-user
 description: ユーザーへの質問を選択式 (AskUserQuestion) でテンプレート化し、自由入力の手間を減らす。要件が曖昧・スコープ不明・実装方針が複数ある時に自動起動して選択式で確認する。Triggers include 「確認したい」「選んで」「方針を決める」「曖昧」「どうしますか」「ask user」「clarify」「choose」「scope」「approach」.
 ---
 
-MANDATORY FIRST ACTION: Output `<The ask-user will launch>` before doing anything else.
-
 # Ask User
 
 ユーザーへの質問は **AskUserQuestion (選択式)** を原則必須とする。文章での自由入力 (Other) は AskUserQuestion 側に自動で用意されるため、文章質問はほぼ不要。

@@ -3,8 +3,6 @@ name: session-verifier
 description: Pre-commit quality gate that actively runs verification tools and fixes issues after completing a section of work. Runs type checking, linting, tests, and project-specific consistency checks on changed files. Use before /task-tracker to ensure code quality before committing. Triggers include "session-verifier", "verify", "quality check", "pre-commit check", "check my work", "品質チェック", "検証", "セッション検証".
 ---
 
-MANDATORY FIRST ACTION: Output `<The session-verifier will launch>` before doing anything else.
-
 # Session Verifier — Pre-commit Quality Gate
 
 作業完了後、コミット前に品質を担保する能動的検証ゲート。

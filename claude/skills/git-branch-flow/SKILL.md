@@ -3,8 +3,6 @@ name: git-branch-flow
 description: Branch strategy and PR workflow procedures (GitHub Flow default). Use when creating a branch, opening a PR, choosing between merge / rebase / squash, integrating main into a feature branch, or deleting a merged branch. Triggers include "ブランチ切って", "PR 作って", "rebase", "squash", "merge", "main を取り込む", "branch", "pull request", "マージ方法".
 ---
 
-MANDATORY FIRST ACTION: Output `<The git-branch-flow will launch>` before doing anything else.
-
 # Git Branch Flow — 手順カタログ
 
 ブランチ戦略・PR 作成・マージ判断の **手順** をまとめたスキル。規約・安全則は `git-workflow` スキル参照。
@@ -89,15 +87,25 @@ refactor/dataservice-extract-cache
 
 ### Multi-chat Worktree Policy（採用プロジェクト限定）
 
-プロジェクトの `CLAUDE.md` に "Multi-chat Worktree Policy" 節がある場合（例: life-editor §7.4）、**メインリポジトリは指定の専有ブランチ（通常 `main`）のみを許可**する。lead-pipeline スキルの "Worktree Policy" 節と相互に参照する（采配の入口はそちら、ブランチ手順は本節）。
+プロジェクトの `CLAUDE.md` に "Multi-chat Worktree Policy" 節がある場合（例: life-editor §7.4）、**メインリポジトリは指定の専有ブランチ（通常 `main`）のみを許可**する。**worktree 手順の正本は本節**（lead-pipeline の "Worktree Policy" 節は采配の入口としてここを参照するだけ）。プロジェクトに専用スキルがあればそちらが優先（例: life-editor の `worktree-policy`）。
 
-| 状況                                                                                                                                | 対応                                                                                                                                                                                   |
-| ----------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| メインリポジトリ（`git rev-parse --show-toplevel` が `.claude/worktrees/` 配下でない）で feature への `git checkout` を提案されたら | **停止**。worktree 経由に誘導                                                                                                                                                          |
-| feature 作業の開始要求                                                                                                              | **3 段必須セット**: `git worktree add .claude/worktrees/<slug>/ -b <branch>` → `cd .claude/worktrees/<slug>/` → `echo <branch> > .claude/comm/.session-branch`（最後に `claude` 起動） |
-| 既存 feature branch を別チャットで触りたい                                                                                          | `git worktree add .claude/worktrees/<slug>/ <existing-branch>` → `cd` → `echo <existing-branch> > .claude/comm/.session-branch`                                                        |
-| 同一 branch を 2 つの worktree から触ろうとした                                                                                     | **停止**。git 仕様で禁止（`--force` は破損リスク）。branch 分割を提案                                                                                                                  |
-| `.session-branch` 未宣言で feature worktree 起動                                                                                    | （proactive 失敗時のフォールバック）`echo <branch> > .claude/comm/.session-branch` を促す。名札が無いと担当 branch の突き合わせができないため、作成手順に組み込むのが正                |
+**worktree 作成の 4 ステップ（1 セット・途中省略禁止）**:
+
+```bash
+git worktree add .claude/worktrees/<slug>/ -b <branch>   # 1. 作業机を出す（既存 branch なら -b を外す）
+cd .claude/worktrees/<slug>/                             # 2. その机に座る
+echo <branch> > .claude/comm/.session-branch             # 3. 担当ブランチの名札を貼る ★必須
+claude                                                   # 4. （または別ターミナルで claude --worktree <slug>）
+```
+
+step 3 を省略すると担当 branch の宣言が残らず、`pwd` の branch と突き合わせられない。「未宣言なら促す」(reactive) ではなく「作成手順に組み込む」(proactive) が正。
+
+| 状況                                                                                                                                | 対応                                                                  |
+| ----------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| メインリポジトリ（`git rev-parse --show-toplevel` が `.claude/worktrees/` 配下でない）で feature への `git checkout` を提案されたら | **停止**。上記 4 ステップに誘導                                       |
+| feature 作業の開始要求 / 既存 feature branch を別チャットで触りたい                                                                 | 上記 4 ステップ（既存 branch は step 1 の `-b` を外す）               |
+| 同一 branch を 2 つの worktree から触ろうとした                                                                                     | **停止**。git 仕様で禁止（`--force` は破損リスク）。branch 分割を提案 |
+| `.session-branch` 未宣言で feature worktree 起動                                                                                    | （proactive 失敗時のフォールバック）step 3 を今から実行するよう促す   |
 
 policy 不在のプロジェクトでは本節をスキップし §1 GitHub Flow に従う。
 
@@ -261,17 +269,14 @@ gh pr merge <PR#> --merge --delete-branch
 
 `--delete-branch` で merge 後の feature branch 自動削除（推奨）。
 
-### 自動マージ（既定・2026-07-29 ユーザー指定）
+### 自動マージ
 
-PR 作成後のマージはユーザー確認を挟まず実行する。条件と例外は `git-workflow` §0.1.1 が正本（conflict 無し + role-qa 通過の 2 点）。手順:
+**可否の判定規定は `git-workflow` §0.1.1 が正本**（自動マージの条件・`UNKNOWN` 時の再取得・プロジェクト側 override）。本節が持つのはマージ実行と後片付けの手順だけ:
 
 ```bash
-gh pr view <PR#> --json mergeable,mergeStateStatus,statusCheckRollup   # 1. conflict 判定
-gh pr merge <PR#> --squash --delete-branch                             # 2. 条件を満たせば即実行
-git checkout main && git pull --rebase origin main                     # 3. §7 のクリーンアップ
+gh pr merge <PR#> --squash --delete-branch                             # 1. 条件を満たしたら実行
+git checkout main && git pull --rebase origin main                     # 2. §7 のクリーンアップ
 ```
-
-`mergeable` が `CONFLICTING` / `UNKNOWN`（判定中）なら自動マージしない。`UNKNOWN` は GitHub 側の計算待ちなので数秒おいて 1 回だけ再取得し、それでも確定しなければユーザーに報告して止まる。
 
 ---
 
