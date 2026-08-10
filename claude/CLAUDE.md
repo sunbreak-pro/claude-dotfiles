@@ -58,13 +58,4 @@
 
 ### CLAUDE.md の標準章構成（Software の場合）
 
-1. Meta（役割・更新ルール・関連ドキュメント表）
-2. Vision 要約（詳細は `docs/vision/core.md`）
-3. Platform / Tech Stack
-4. Architecture
-5. Data Model（ある場合）
-6. AI Integration（ある場合）
-7. Coding Standards
-8. Development Workflows
-9. Feature Tier Map（詳細は `docs/requirements/`）
-10. Document System（フロー・Known Issue ライフサイクル）
+新規・既存プロジェクトで `.claude/` を立ち上げる / 整えるときの標準構造・運用原則・CLAUDE.md の標準章構成は **`project-setter` スキルが正本**。プロジェクトを作る時にだけ要るので、常時ロードから外した（2026-08-06）。
