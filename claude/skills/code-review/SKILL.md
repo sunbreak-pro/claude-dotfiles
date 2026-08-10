@@ -3,8 +3,6 @@ name: code-review
 description: Structured code review checklist and output format. Use when reviewing code changes, PRs, diffs, or when the user asks for feedback on code quality. Triggers include "review", "PR", "diff", "code quality", "security check", and any request to evaluate code for correctness, security, performance, or maintainability.
 ---
 
-MANDATORY FIRST ACTION: Output `<The code-review will launch>` before doing anything else.
-
 # Code Review
 
 ## Review Process
@@ -24,6 +22,8 @@ MANDATORY FIRST ACTION: Output `<The code-review will launch>` before doing anyt
 - Missing error handling at system boundaries (user input, external APIs)
 
 ### Security
+
+This is a **quick pass**. When the diff warrants a real audit (auth / authz, secrets, DB or IPC boundaries, user-supplied input reaching a sink), hand it to the `security-reviewer` agent instead of going deeper here.
 
 - SQL injection, XSS, command injection (OWASP top 10)
 - Exposed secrets, credentials, or API keys
