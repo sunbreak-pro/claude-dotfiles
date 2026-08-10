@@ -5,7 +5,7 @@ description: >
   以下のときに自動起動する：
   (1) ユーザーが「並行作業の状態見て」「他のチャットと競合してない?」「全体どこまで進んでる?」と言ったとき
   (2) サブエージェントを 2 つ以上並列起動する直前（起動順・依存・コンテキスト分離の妥当性を判定）
-  (3) 共有資源（.claude/memory/ + history/ per-chat ファイル群 / 旧 .claude/MEMORY.md / HISTORY.md (凍結) / agents-lib / skill-lib）に複数チャット/サブエージェントが触る可能性があるとき
+  (3) 共有資源（.claude/memory/ + history/ per-chat ファイル群 / 旧 .claude/MEMORY.md / HISTORY.md (凍結) / claude-dotfiles の claude/agents・claude/skills）に複数チャット/サブエージェントが触る可能性があるとき
   (4) セッション開始時に他チャットが活動中の可能性を確認したいとき
   (5) スキル / エージェント定義ファイル編集前（メタ干渉防止）
 
@@ -14,7 +14,7 @@ description: >
   自身ではコード/設定ファイル/git 操作を行わない。**状況把握と監視・調整提案のみ**を担当する。
   ロック取得・解放やブランチ戦略の教育的解説は本エージェントの範疇外（git 操作は git-workflow スキル、ブランチ戦略はユーザー判断に委ねる）。
 model: opus
-effort: xhigh
+effort: high
 tools: [Read, Glob, Bash]
 permissionMode: default
 ---

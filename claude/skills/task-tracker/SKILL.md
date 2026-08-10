@@ -292,6 +292,10 @@ per-chat モードの `chat-<self>.md` も legacy モードの `MEMORY.md` / `HI
 
 ## 作業終了フロー
 
+> **実行タイミング = `session-verifier` が緑になった直後**（2026-08-10 ユーザー確定・life-editor `D-20260810-main-1`）。ユーザーの確認も、実装 PR の merge も待たない。「merge したら声をかけてください」でセッションを止めないこと — merge は人の手番なので、待つと終端が人待ちで固まる。実装 PR の状態は**書いた時点の実測**（open / merged）で記す。
+>
+> tracker の更新を実装ブランチに載せない運用のプロジェクトでは、専用ブランチ（life-editor は `chore/tracker-<chat>-YYYYMMDD`）を切って commit → PR まで進める。
+
 1. Step 0 (モード判定 + self 解決) 同上
 2. Read で memory + history 両ファイル取得 (並列)
 3. memory ファイル更新:
@@ -305,17 +309,27 @@ per-chat モードの `chat-<self>.md` も legacy モードの `MEMORY.md` / `HI
    #### 概要 (1〜2文)
    #### 変更点 (箇条書き)
    ```
-5. 計画書アーカイブ (両モード共通):
+5. 計画書アーカイブ (両モード共通・**実行者は本スキル**。code-plan-editor は参照のみで archive しない):
    - a. `.claude/docs/vision/plans/YYYY-MM-DD-*.md` パターンの実装プランファイルを Glob で確認 (fallback として `.claude/YYYY-MM-DD-*.md` legacy 配置も確認)
    - b. 完了タスクに関連する計画書を特定:
      - ファイル内の `**Task**:` がタスク名と一致
      - またはファイル名 slug がタスク名と部分一致
    - c. 該当ファイルが見つかった場合:
+     - **乖離レビュー 3 行を計画書の Worklog へ必須記入**（下記）
      - Status を `COMPLETED` に更新 (Edit)
      - `.claude/archive/` に移動 (Bash: `mv`)
      - `.claude/archive/` が存在しない場合は作成してから移動
      - history エントリの完了記録に `（計画書: archive/ファイル名）` を付記
    - d. 該当ファイルがない場合はサイレントスキップ
+
+   **乖離レビュー 3 行**（archive 前に必ず Worklog へ追記する。「特になし」も明記して省略しない）:
+
+   1. **スコープ逸脱**: Scope 宣言の外を触ったか。触ったなら何をどういう判断で
+   2. **AC 免除**: 満たせなかった Acceptance Criteria と、その扱い（免除したなら誰の承認で）
+   3. **途中で出た判断の行き先**: 実装中に浮上した追加要望・QA の Suggestion・verifier の非 Blocking finding を、どこへ送ったか（判断キュー / Issue # / decisions の D-ID / 破棄）
+
+   3 行のいずれかが**規約級**（今後の全作業に効くルールの話）なら、`decisions/` の台帳か `docs/known-issues/` へ昇格させる。ここで拾わなかった指摘は消えるので、行き先の空欄を残さない。
+
 6. ローリングアーカイブ:
    - **per-chat モード**: 該当 `history/chat-<self>.md` が 5 件超過なら、最古エントリを `history/archive/YYYY-MM/chat-<self>.md` へ移動 (ディレクトリは必要時 mkdir)
    - **legacy モード**: 従来通り `HISTORY.md` 5 件超過 → `HISTORY-archive.md`

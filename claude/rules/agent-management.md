@@ -1,27 +1,17 @@
 ---
 paths:
   - "**/agents/**"
-  - "**/agents-lib/**"
 ---
 
 # Agent Management
 
-> path-scoped rule: エージェント定義（`agents/` ・ `agents-lib/`）を扱う時のみ自動ロードされる（毎セッション常駐させない）。
+> path-scoped rule: エージェント定義（`agents/`）を扱う時のみ自動ロードされる（毎セッション常駐させない）。
 
-## 一元管理ルール
+## 配置ルール
 
-エージェント実体は全て `~/dev/Claude/agents-lib/` で一元管理する。`~/.claude/agents/` やプロジェクトの `.claude/agents/` にはシンボリックリンクのみ配置する。
+グローバルエージェントの実体は `claude-dotfiles` リポジトリの `claude/agents/` にフラットに置く。`~/.claude/agents` はそのディレクトリへのシンボリックリンク（ディレクトリごと 1 本）なので、**リポジトリ側を編集すればそのまま反映される**。ファイル単位のリンク作成・インデックス更新は不要。
 
-## カテゴリ構造
-
-```
-~/dev/Claude/agents-lib/
-├── global/      # 自作グローバル → ~/.claude/agents/ にリンク
-├── projects/    # プロジェクト固有 → <project>/.claude/agents/ にリンク
-├── archive/     # 非活性 / 低頻度（リンクしない）
-├── vendor/      # サードパーティ配布物（リンクしない）
-└── AGENT_INDEX.md
-```
+プロジェクト固有エージェントは各プロジェクトの `.claude/agents/` に直接置く。
 
 ## 設計方針
 
@@ -31,11 +21,13 @@ paths:
 
 ### effort/model 設定方針
 
-- **記録系（記録のみ・探索不要）**: `model: sonnet` / `effort: medium` 以上
-- **分析系（探索 + 提案）**: `model: opus` / `effort: high` 以上
-- **オーケストレーター型（状況判断 + 振り分け）**: `model: opus` / `effort: xhigh`
+- **記録系 / 情報収集系（探索不要・結果をまとめて返すだけ）**: `model: sonnet` 、`effort` は未指定でセッション既定を継承
+- **分析・実装系（探索 + 提案 + 実装）**: `model: opus` / `effort: high`
+- **監査系（見落としのコストが高い role-qa / security-reviewer）**: `model: opus` / `effort: xhigh`
 
-トークン消費よりも精度を優先する設計。
+**子の effort はメインチャットを超えさせないのが基本**。基準値はハードコードせず、**実効 `~/.claude/settings.json` の `effortLevel` を都度確認する**（dotfiles 側の設定と実効値がずれていることがある）。子は課題が絞られた状態で起動されるぶん、メインより浅い思考でも精度が出る。例外は監査系だけで、これは「見逃したら後で高くつく」ぶんを先払いする意味がある。
+
+**サブエージェントに Fable 5 は割り当てない。** 子エージェントは短い単発仕事が中心で Fable 5 の長所（長時間の自律実行）が出ないまま単価だけ倍になる。Fable 5 はメインチャットで手動切り替えして使う切り札に留める。セキュリティ観点のレビューは特に Fable 5 を避ける（サイバー系の安全判定で正当なレビューが拒否されることがある）。
 
 ### description は起動条件を具体的に書く
 
@@ -48,20 +40,13 @@ Claude は description を元に自動起動を判断する。曖昧な記述は
 
 ## 新規エージェント作成手順
 
-1. 該当カテゴリ（`global/` / `projects/<project>/`）にエージェント `.md` を作成
-2. YAML frontmatter に `name` / `description` / `tools` / `model` / `effort` / `permissionMode` を記述
-3. シンボリックリンク作成:
-   ```bash
-   ln -s ~/dev/Claude/agents-lib/global/<name>.md ~/.claude/agents/<name>.md
-   ```
-4. `~/dev/Claude/agents-lib/AGENT_INDEX.md` を更新
+1. `claude/agents/<name>.md` を作成する（グローバルの場合）
+2. YAML frontmatter に `name` / `description` / `tools` / `model` / `effort` / `permissionMode` を記述する
+3. 保存した時点で `~/.claude/agents` 経由で有効になる。リンク作業・インデックス更新は不要
 
-## Archive 運用
+## 非活性化
 
-低頻度・非活性エージェントは `archive/` に移して `~/.claude/agents/` のリンクは削除する（Skill と同じ運用）。必要時:
-
-- **一時再リンク**: `ln -s ~/dev/Claude/agents-lib/archive/<name>.md ~/.claude/agents/<name>.md` → 使用後削除
-- **直接参照**: `Read ~/dev/Claude/agents-lib/archive/<name>.md` で内容のみ取得
+不要になったエージェントは frontmatter の `description` を絞って自動起動を止めるか、ファイルごと削除する。`~/.claude/agents` はディレクトリごとのリンクなので、リポジトリ側の削除がそのまま反映される（別途リンクを外す作業は不要）。
 
 ## 削除前の確認義務
 

@@ -34,6 +34,7 @@ description: 外来の実装タスクを受けた瞬間に、軽重ティアを�
 
 ## 中ティアの手順
 
+0. **ミニスコープ宣言**（計画書は作らない）— 着手時に「対象ファイル / 完了条件 / 触らないもの」を 1〜3 行チャットに宣言する。宣言の外に手を出したくなったら実装せず、判断キュー or Issue へ積んで現作業を続ける（life-editor なら POLICY P-008）。軽ティアは対象外（typo にゲートは過剰）
 1. 実装（必要なら role-engineer を Agent 起動、軽めならメイン直接）
 2. **session-verifier**（skill）— 型 / lint / test / 構造。失敗したら止めて修正
 3. **playwright-ui-verifier**（agent）— UI に見える変更のみ。実ブラウザで runtime 検証（opus / xhigh・[[playwright-verify]] 手順）。BLOCKING findings はメインが修正 → 再検証
@@ -56,7 +57,10 @@ description: 外来の実装タスクを受けた瞬間に、軽重ティアを�
        └─ 観点独立なら security-reviewer / life-editor 系 validator を role-qa と並列起動可
 6. task-tracker (skill, END)              ← MEMORY/HISTORY 詳細記録 + plan archive + commit
 7. git-workflow (skill)                   ← branch 保護判定。PR は git-branch-flow へ
+8. PR マージ                              ← 可否の正本 = git-workflow §0.1.1
 ```
+
+> **PR マージの規定の正本 = `git-workflow` §0.1.1**（自動マージの条件・軽 / 中ティアで PR を出す場合の扱いを含む）。ここには転記しない。**プロジェクト側の POLICY / CLAUDE.md による override が常に優先**する（例: life-editor は P-001「merge は常にユーザー」で自動マージ不適用）。
 
 ### 並列化の判断
 
@@ -84,14 +88,8 @@ UserPromptSubmit hook (`~/.claude/hooks/pipeline-gate.mjs`) が実装系キー�
 プロジェクトの `CLAUDE.md` に "Multi-chat Worktree Policy" 節 (例: life-editor §7.4) がある場合、ティア判定の**前**に以下を確認する:
 
 1. **現在 main repo か worktree か** — `git rev-parse --show-toplevel` と `git branch --show-current` を読む
-2. **メインリポジトリで feature 作業を始めようとしていないか** — メイン (`/path/to/repo`) 上で `main` 以外のブランチに切り替えようとしている場合、停止して worktree 提案へ誘導。**4 ステップを 1 セットとして提示する**（途中省略禁止 — 特に step 3 の echo を抜くと担当 branch の名札が残らない）:
-   ```
-   git worktree add .claude/worktrees/<slug>/ -b <new-branch>     # 1. 作業机を出す
-   cd .claude/worktrees/<slug>/                                    # 2. その机に座る
-   echo <new-branch> > .claude/comm/.session-branch                # 3. 担当バージョン名札を貼る ★必須
-   claude                                                          # 4. （または別ターミナルで claude --worktree <slug>）
-   ```
-3. **`.session-branch` 書き出しは ifガードではなく作成手順の一部** — 上記 step 3 を省略すると `.claude/comm/.session-branch` に担当 branch の宣言が残らず、`pwd` の branch と担当宣言の突き合わせができない。「未宣言なら促す」(reactive) ではなく「作成手順に組み込む」(proactive) が正
+2. **メインリポジトリで feature 作業を始めようとしていないか** — メイン (`/path/to/repo`) 上で `main` 以外のブランチに切り替えようとしている場合、停止して worktree 提案へ誘導する。**手順の正本 = `git-branch-flow`（worktree 作成の 4 ステップ 1 セット）**。プロジェクトに worktree 用スキルがあればそちらが優先（例: life-editor の `worktree-policy`）
+3. **`.session-branch` 書き出しは ifガードではなく作成手順の一部** — 担当 branch の宣言ファイルを書く step を省略すると `pwd` の branch と担当宣言の突き合わせができない。「未宣言なら促す」(reactive) ではなく「作成手順に組み込む」(proactive) が正
 
 引っ越しに例えると、メイン台所で別の家族の引っ越し作業を始めると混乱する。新規プロジェクトは別の部屋（worktree）に荷物を運んでから作業する。
 

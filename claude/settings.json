@@ -9,7 +9,7 @@
     ],
     "defaultMode": "auto"
   },
-  "model": "claude-fable-5[1m]",
+  "model": "claude-opus-5",
   "outputStyle": "tone-persona",
   "hooks": {
     "UserPromptSubmit": [
@@ -19,6 +19,10 @@
           {
             "type": "command",
             "command": "node {{CLAUDE_DIR}}/hooks/pipeline-gate.mjs"
+          },
+          {
+            "type": "command",
+            "command": "node {{CLAUDE_DIR}}/hooks/graphify-nudge.mjs"
           }
         ]
       }
@@ -30,10 +34,6 @@
           {
             "type": "command",
             "command": "node {{CLAUDE_DIR}}/hooks/post-edit-prettier.mjs"
-          },
-          {
-            "type": "command",
-            "command": "node {{CLAUDE_DIR}}/hooks/adversarial-review-gate.mjs record"
           }
         ]
       }
@@ -76,10 +76,6 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node {{CLAUDE_DIR}}/hooks/adversarial-review-gate.mjs check"
-          },
-          {
-            "type": "command",
             "command": "node {{CLAUDE_DIR}}/hooks/sui-memory.mjs save",
             "timeout": 60000
           }
@@ -104,7 +100,7 @@
   },
   "enabledPlugins": {},
   "alwaysThinkingEnabled": true,
-  "effortLevel": "xhigh",
+  "effortLevel": "high",
   "skipWorkflowUsageWarning": true,
   "remoteControlAtStartup": true,
   "agentPushNotifEnabled": true,

@@ -3,8 +3,6 @@ name: life-editor-mcp
 description: Life Editor MCP ツールを使ったメモ・ノート・タスク・スケジュールの記録スキル。作業ログ、設計メモ、学習記録、アイデアなどを Life Editor に保存する。Triggers include "メモ", "ノートに記録", "Life Editorに書く", "記録して", "note", "memo", "write to life editor", "save note", "日記", "ジャーナル", "作業ログ".
 ---
 
-MANDATORY FIRST ACTION: Output `<The life-editor-mcp will launch>` before doing anything else.
-
 # Life Editor MCP — 記録・メモスキル
 
 Life Editor の MCP ツールを使って情報を記録する。

@@ -3,8 +3,6 @@ name: efficient-codebase-nav
 description: Efficient codebase exploration and navigation strategies for Claude Code. Use this skill when starting work on any codebase task - especially after /clear, when spawning subagents, or when needing to understand project structure quickly. Triggers include file exploration, feature implementation, bug investigation, code reading, and any task requiring codebase context. Also use when delegating tasks to subagents to minimize redundant exploration.
 ---
 
-MANDATORY FIRST ACTION: Output `<The efficient-codebase-nav will launch>` before doing anything else.
-
 # Efficient Codebase Navigation
 
 Minimize exploration time and context consumption when working with codebases. Use Claude Code native tools (Glob, Grep, Read) instead of bash commands.
@@ -18,6 +16,8 @@ Glob(".claude/skills/*/Skill.md")
 ```
 
 If a project map skill exists, Read it first. It contains pre-analyzed structure that eliminates broad exploration.
+
+If the repo has a `graphify-out/` directory, query the existing knowledge graph (`graphify` skill) before any Glob / Grep sweep — the graph already answers "where does X live / what depends on X" without spending context on exploration.
 
 ## Exploration Strategy: Priority-Based Discovery
 
