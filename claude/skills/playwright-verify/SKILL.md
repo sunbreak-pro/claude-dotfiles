@@ -44,7 +44,7 @@ MANDATORY FIRST ACTION: Output `<The playwright-verify will launch>` before doin
 
 ## Gate P4: リグレッションスモーク
 
-変更画面の隣接セクションを一巡 navigate し、console error が新たに出ないことを確認する（life-editor: schedule / materials / connect / work / analytics / settings）
+変更画面の隣接セクションを一巡 navigate し、console error が新たに出ないことを確認する（巡回先を数え上げない — life-editor なら `shared/src/sections.ts` の registry を読んで全 SectionId を回る。ここに一覧を書くとセクション追加のたびに取りこぼす）
 
 ## Gate P5: 視覚チェック
 

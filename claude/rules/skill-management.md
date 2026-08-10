@@ -36,11 +36,25 @@ hooks のような「実体が無ければ repo 内の予備を呼ぶ」二段�
 
 ## `skill-lib` / `agents-lib` は retired
 
-`~/dev/Claude/skill-lib` と `~/dev/Claude/agents-lib` は旧・一元管理の置き場。**git リポジトリですらなく Mac にしか存在しない**ため、可搬性を持てない構造だった（2026-08-10 廃止 = life-editor `decisions/D-20260810-main-1`）。
+`~/dev/Claude/skill-lib` と `~/dev/Claude/agents-lib` は旧・一元管理の置き場。**git リポジトリですらなく Mac にしか存在しない**ため、可搬性を持てない構造だった（2026-08-10 廃止 = life-editor `decisions/D-20260810-main-2`）。
 
 - グローバル分は既に本リポジトリの `claude/skills/` / `claude/agents/` が正本（`skill-lib/global` は drift した残骸）
 - life-editor 分は 2026-08-10 に repo 内へ vendor 化済み
-- **未移行**: `battle-bakeoff`（agents 3）/ `original-card-battle`（agents 3 + skills 1）/ `terminal-division`（skills 8）。これらを移すまで `skill-lib` / `agents-lib` 本体は消さない
+
+### まだ生きている参照（実測 2026-08-10 — 消す前に必ず数え直す）
+
+`skill-lib` / `agents-lib` 本体を消すと以下が一斉に死ぬ。**この表が削除ゲート**なので、片付けた分は都度消すこと。
+
+| 参照元                 | 内訳                                                                                                  |
+| ---------------------- | ----------------------------------------------------------------------------------------------------- |
+| `novel`                | skills 6 → `skill-lib/projects/novel` ／ agents 8 → `agents-lib/projects/novel`（**最大の未移行先**） |
+| `terminal-division`    | skills 8 → `skill-lib/global` ／ 1 → `projects/_shared/feature-files`                                 |
+| `original-card-battle` | agents 3 → `agents-lib/projects/original-card-battle` ／ skills 1 → `projects/_shared/feature-files`  |
+| `battle-bakeoff`       | agents 3 → 上と**同一ファイル**を指す（合計 6 本ではない）                                            |
+
+- `terminal-division` の 8 本は `skill-lib/global` 行き = 本来グローバル資産。プロジェクト固有として移すのではなく、`~/.claude/skills`（= 本リポジトリ）から拾う形に直すのが筋
+- `novel` には第 4 の置き場 `~/dev/Claude/original-skills-storage/` を指す symlink も 3 本ある。ここも同じ問題を抱えている
+- `skill-lib/archive/` に 13 本（`project-setter` / `skill-creator` 等）が眠っている。グローバル `CLAUDE.md` は今も `/project-setter` を案内しているので、**退役前に本リポジトリへ移すか、案内を消すかを決める**
 
 ## Description 最適化
 
