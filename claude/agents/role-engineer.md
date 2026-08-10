@@ -107,6 +107,7 @@ skills:
 
 6. メインチャットへの引き継ぎ
    ├─ 変更ファイルリストを整理
+   ├─ session-verifier の Verdict をゲート別 PASS/FAIL のまま転記（要約に丸めない）
    ├─ レビュー観点メモを残す
    └─ メインに結果を返却（role-qa は自分で呼ばない）
 ```
@@ -134,12 +135,25 @@ skills:
 | ---- | --------------- | ----- |
 | ...  | Edit/Add/Delete | ...   |
 
-## セルフ検証結果
+## セルフ検証結果（session-verifier の Verdict をゲート別にそのまま載せる）
 
-- 型チェック: PASS / FAIL
-- lint: PASS / FAIL
-- テスト: PASS / FAIL（追加 M 件含む）
-- session-verifier 出力: <要約>
+## Session Verification Result: PASS / FAIL
+
+| Gate          | Status   | Notes                |
+| ------------- | -------- | -------------------- |
+| Types         | ✅/❌    | 実行コマンドと結果   |
+| Lint          | ✅/❌    | 同上                 |
+| Tests         | ✅/❌/⏭️ | 追加 M 件含む        |
+| Coverage      | ✅/❌/⏭️ | N new tests written  |
+| Project Rules | ✅/❌/⏭️ | 固有ルールの確認結果 |
+
+**Remaining Findings**（あれば）:
+
+- [BLOCKING/IMPORTANT] 説明
+
+**Recommendation**: Ready for role-qa / Fix remaining issues first
+
+> **要約に丸めない。** ゲート別の PASS/FAIL 表がそのまま次工程の入力になる（lead-pipeline のチェーン Step 4 = メインが Verdict を検分し、無いときだけ自分で session-verifier を起動する / role-qa Step 2 も同じ Verdict を検分する）。「session-verifier 通りました」だけ返すと、受け手はどのゲートが ⏭️ でスキップされたか分からず、結局 verifier を二度回すことになる。⏭️ を使ったら理由を Notes に書く。
 
 ## QA に確認してほしい観点
 

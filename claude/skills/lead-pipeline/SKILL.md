@@ -36,7 +36,7 @@ description: 外来の実装タスクを受けた瞬間に、軽重ティアを�
 
 1. 実装（必要なら role-engineer を Agent 起動、軽めならメイン直接）
 2. **session-verifier**（skill）— 型 / lint / test / 構造。失敗したら止めて修正
-3. **task-tracker**（skill）— MEMORY/HISTORY 更新 + commit
+3. **task-tracker**（skill）— MEMORY/HISTORY 更新 + commit。**2 が緑になったらそのまま実行する** — ユーザーの確認も PR の merge も待たない（life-editor `D-20260810-main-1`）
 4. commit 後に PR を出すなら **git-workflow**（skill）/ PR 手順は **git-branch-flow** へ
 
 ## 重ティアのフルチェーン

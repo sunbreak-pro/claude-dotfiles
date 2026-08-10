@@ -292,6 +292,10 @@ per-chat モードの `chat-<self>.md` も legacy モードの `MEMORY.md` / `HI
 
 ## 作業終了フロー
 
+> **実行タイミング = `session-verifier` が緑になった直後**（2026-08-10 ユーザー確定・life-editor `D-20260810-main-1`）。ユーザーの確認も、実装 PR の merge も待たない。「merge したら声をかけてください」でセッションを止めないこと — merge は人の手番なので、待つと終端が人待ちで固まる。実装 PR の状態は**書いた時点の実測**（open / merged）で記す。
+>
+> tracker の更新を実装ブランチに載せない運用のプロジェクトでは、専用ブランチ（life-editor は `chore/tracker-<chat>-YYYYMMDD`）を切って commit → PR まで進める。
+
 1. Step 0 (モード判定 + self 解決) 同上
 2. Read で memory + history 両ファイル取得 (並列)
 3. memory ファイル更新:
