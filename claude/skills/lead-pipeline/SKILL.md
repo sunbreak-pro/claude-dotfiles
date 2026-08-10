@@ -37,7 +37,7 @@ description: 外来の実装タスクを受けた瞬間に、軽重ティアを�
 0. **ミニスコープ宣言**（計画書は作らない）— 着手時に「対象ファイル / 完了条件 / 触らないもの」を 1〜3 行チャットに宣言する。宣言の外に手を出したくなったら実装せず、判断キュー or Issue へ積んで現作業を続ける（life-editor なら POLICY P-008）。軽ティアは対象外（typo にゲートは過剰）
 1. 実装（必要なら role-engineer を Agent 起動、軽めならメイン直接）
 2. **session-verifier**（skill）— 型 / lint / test / 構造。失敗したら止めて修正
-3. **task-tracker**（skill）— MEMORY/HISTORY 更新 + commit
+3. **task-tracker**（skill）— MEMORY/HISTORY 更新 + commit。**2 が緑になったらそのまま実行する** — ユーザーの確認も PR の merge も待たない（life-editor `D-20260810-main-1`）
 4. commit 後に PR を出すなら **git-workflow**（skill）/ PR 手順は **git-branch-flow** へ
 
 ## 重ティアのフルチェーン
