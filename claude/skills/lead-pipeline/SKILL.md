@@ -1,6 +1,6 @@
 ---
 name: lead-pipeline
-description: 外来の実装タスクを受けた瞬間に、軽重ティアを判定して必要工程だけを一気通貫で采配するメインチャット用プレイブック。ultracode キーワード検出時はティア判定を省略し references/ultracode-mode.md の並列采配へ切り替える。sub-agent は再帰起動不可のため、メイン自身が Agent ツールで task-tracker / role-pm / execution-router / role-engineer / session-verifier / role-qa / git-workflow を順に起動する。質問・調査・雑談では使わない。Triggers include "実装して", "作って", "機能追加", "直して", "修正", "fix", "implement", "feature", "refactor", "一気通貫", "lead pipeline", "ultracode", "ウルトラコード", "総力戦", "並列で全力", "全エージェント投入", "multi-agent orchestration".
+description: 外来の実装タスクを受けた瞬間に、軽重ティアを判定して必要工程だけを一気通貫で采配するメインチャット用プレイブック。ultracode キーワード検出時はティア判定を省略し references/ultracode-mode.md の並列采配へ切り替える。sub-agent は再帰起動不可のため、メイン自身が Agent ツールで task-tracker / role-pm / execution-router / role-engineer / session-verifier / playwright-ui-verifier / role-qa / git-workflow を順に起動する。質問・調査・雑談では使わない。Triggers include "実装して", "作って", "機能追加", "直して", "修正", "fix", "implement", "feature", "refactor", "一気通貫", "lead pipeline", "ultracode", "ウルトラコード", "総力戦", "並列で全力", "全エージェント投入", "multi-agent orchestration".
 ---
 
 # Lead Pipeline — 実装タスク一気通貫プレイブック
@@ -36,8 +36,9 @@ description: 外来の実装タスクを受けた瞬間に、軽重ティアを�
 
 1. 実装（必要なら role-engineer を Agent 起動、軽めならメイン直接）
 2. **session-verifier**（skill）— 型 / lint / test / 構造。失敗したら止めて修正
-3. **task-tracker**（skill）— MEMORY/HISTORY 更新 + commit
-4. commit 後に PR を出すなら **git-workflow**（skill）/ PR 手順は **git-branch-flow** へ
+3. **playwright-ui-verifier**（agent）— UI に見える変更のみ。実ブラウザで runtime 検証（opus / xhigh・[[playwright-verify]] 手順）。BLOCKING findings はメインが修正 → 再検証
+4. **task-tracker**（skill）— MEMORY/HISTORY 更新 + commit
+5. commit 後に PR を出すなら **git-workflow**（skill）/ PR 手順は **git-branch-flow** へ
 
 ## 重ティアのフルチェーン
 
@@ -49,7 +50,8 @@ description: 外来の実装タスクを受けた瞬間に、軽重ティアを�
 2. execution-router (skill)               ← /goal /batch /loop /subagent のどれで回すか判断
        └─ /goal /batch /loop が最適なら、コマンド文字列をユーザーに提示して指示を仰ぐ
 3. role-engineer (agent)                  ← 実装（or execution-router が出した方式で実行）
-4. session-verifier (skill)               ← 自己検証ゲート。失敗で停止
+4. session-verifier (skill)               ← 自己検証ゲート（静的）。失敗で停止
+4.5 playwright-ui-verifier (agent)        ← UI に見える変更のみ。実ブラウザ runtime 検証（opus / xhigh）
 5. role-qa (agent, 別コンテキスト)         ← 独立監査。自己評価バイアス回避で必ず別 Agent
        └─ 観点独立なら security-reviewer / life-editor 系 validator を role-qa と並列起動可
 6. task-tracker (skill, END)              ← MEMORY/HISTORY 詳細記録 + plan archive + commit
@@ -60,6 +62,7 @@ description: 外来の実装タスクを受けた瞬間に、軽重ティアを�
 
 - 順次必須: `role-pm → role-engineer → role-qa`（依存鎖）
 - 並列可: `role-qa` + `security-reviewer` / life-editor の `ipc-validator`+`migration-validator`+`sync-auditor`（全 Read のみ・観点独立）
+- `role-qa` + `playwright-ui-verifier` も並列可（コード監査と実行時検証で観点独立）。ただし playwright を使うエージェントは**同時 1 体まで**（ブラウザ実体がセッションに 1 つ）
 - 並列起動は 1 メッセージ内で複数 Agent 呼び出し
 
 ## 安全則（必須）
@@ -72,7 +75,7 @@ description: 外来の実装タスクを受けた瞬間に、軽重ティアを�
 
 ## 既存資産との関係（重複しない）
 
-本スキルは采配表のみ。実作業は委譲する: 要件=role-pm / 戦略=execution-router / 実装=role-engineer / 検証=session-verifier / 監査=role-qa / 記録・セッション状態=task-tracker / git=git-workflow（PR は git-branch-flow）。
+本スキルは采配表のみ。実作業は委譲する: 要件=role-pm / 戦略=execution-router / 実装=role-engineer / 静的検証=session-verifier / 実行時検証=playwright-ui-verifier（UI 変更時のみ・[[playwright-verify]] 手順） / 監査=role-qa / 記録・セッション状態=task-tracker / git=git-workflow（PR は git-branch-flow）。
 
 UserPromptSubmit hook (`~/.claude/hooks/pipeline-gate.mjs`) が実装系キーワード（および `ultracode`）検出時に本スキルへのポインタを context 注入し、確実な発火を保証する。hook は注入のみ・判断と起動はメイン。
 
