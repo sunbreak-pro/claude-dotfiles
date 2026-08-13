@@ -24,7 +24,7 @@ lead-pipeline が「荷物の量を見てから運び方を決める現場監督
 各 Phase 内は **1 メッセージ内の複数 Agent 呼び出し**で並列起動する。Phase 間は前段の出力が後段の入力になるため逐次。
 
 ```
-Phase 0  task-tracker (START) — multi-session-coordinator 競合チェック込み
+Phase 0  task-tracker (START) — active-sessions 競合チェック込み
 Phase 1  偵察ファンアウト — Explore agent ×2〜4（対象領域 / 影響範囲 / 既存実装 / known-issues を分担）
 Phase 2  role-pm — Phase 1 の結果を入力に要件分解。独立実装単位（unit）への分割表を出させる
 Phase 3  role-engineer ×N — unit ごとに並列起動（依存 unit のみ逐次）。各 engineer は unit 単位の変更を返す
