@@ -12,12 +12,13 @@ claude-dotfiles/
 │   ├── settings.json        # テンプレート（{{CLAUDE_DIR}} を install 時に実パス展開）
 │   ├── statusline-command.mjs
 │   ├── hooks/               # 全 hook（Node 製・クロスプラットフォーム）
-│   ├── rules/               # グローバルルール (11 ファイル)
+│   ├── rules/               # グローバルルール (7 ファイル・うち 3 本は paths: 付きで非常駐)
 │   ├── agents/              # グローバルエージェント定義 (7 ファイル)
 │   ├── skills/              # グローバルスキル (15 個)
-│   ├── docs/                # hooks_guide.md
+│   ├── docs/                # hooks_guide.md / meta-harness.md / bash-tool-stability.md / plans/
 │   ├── output-styles/       # 口調 output style（tone-persona・常時有効化）
 │   └── templates/           # comm-protocol テンプレート
+├── claude/skills-archive/   # 退避スキル (4 個)。manifest 対象外＝ ~/.claude へ配らない
 ├── manifest.json            # リンク対象一覧（src → ~/.claude/<dest> + mode）
 ├── install.mjs              # インストーラ（symlink、失敗時 copy フォールバック）
 ├── .gitignore
@@ -85,7 +86,9 @@ symlink でインストールされた項目は `~/.claude/` 越しの編集が�
 - `.credentials.json` / `history.jsonl` / `sessions/` / `session-env/` / `projects/` /
   `cache/` / `backups/` / `shell-snapshots/` / `ide/` / `plugins/` / `stats-cache.json` /
   `mcp-needs-auth-cache.json` / `.last-*` ほか runtime state 全般（.gitignore 参照）
-- `sui-memory` 本体（`~/dev/Claude/sui-memory/`）… Mac 専用。hook ラッパーが無いマシンでは自動 no-op
+- `sui-memory` 本体（`~/dev/Claude/sui-memory/`）… Mac 専用。hook ラッパーが無いマシンでは自動 no-op。
+  Windows 機には未インストールのため `hooks/sui-memory.mjs` は素通りし、recall / save は実際には何もしていない
+  （責務境界の宣言は `claude/rules/memory-boundary.md`）
 
 ## 既知の注意点
 
@@ -93,7 +96,7 @@ symlink でインストールされた項目は `~/.claude/` 越しの編集が�
   `~/dev/Claude/skill-lib|agents-lib` への symlink ファーム運用だった。本 repo には
   その実体をコピーしてある。Mac で `install.mjs` を実行すると symlink ファームは
   `.bak` に退避され、**以後の SSOT はこの repo になる**（lib 側は更新されない）。
-- `skills/code-refactoring/scripts/init_lang_refactoring.sh` はスキル内部の補助
-  スクリプトで Windows ネイティブでは動かない（スキル本体の参照資料としては機能する）。
+- `skills-archive/code-refactoring/scripts/init_lang_refactoring.sh` はスキル内部の
+  補助スクリプトで Windows ネイティブでは動かない（退避済みなので現状は未配布）。
 - `settings.json` の `model` / `effortLevel` 等もそのまま共有される。マシンごとに
   変えたい場合は `settings.local.json`（非共有）で上書きする。

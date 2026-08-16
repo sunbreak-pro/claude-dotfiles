@@ -10,7 +10,6 @@ tools: [Read, Write, Edit, Glob, Grep, Skill, Bash]
 permissionMode: default
 skills:
   - efficient-codebase-nav
-  - code-refactoring
   - session-verifier
   - git-workflow
 ---

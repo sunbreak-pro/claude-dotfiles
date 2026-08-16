@@ -1,6 +1,6 @@
 ---
 name: task-tracker
-description: Track task progress in per-chat memory/ and history/ files (or legacy MEMORY.md/HISTORY.md). Also supports a read-only inspect mode for dashboarding other chats' progress without writes. Use at the start and end of every work session, when switching tasks, or when inspecting cross-chat status. Triggers include "task start", "task end", "session start", "session end", "作業開始", "作業終了", "作業途中", "中断", "session pause", "task-tracker inspect", "inspect chats", "他チャットの状況", "per-chat ダッシュボード", and any task status update.
+description: Track task progress in per-chat memory/ and history/ files (legacy MEMORY.md/HISTORY.md), plus a read-only inspect mode for other chats' status. Use at the start and end of every work session and on any task status update. Triggers include "作業開始", "作業終了", "中断", "session start", "session end", "task-tracker inspect", "他チャットの状況".
 ---
 
 > セッション開始 / 終了時に呼び出す。手動呼び出しも可能。

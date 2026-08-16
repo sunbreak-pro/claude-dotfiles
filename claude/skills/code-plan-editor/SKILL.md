@@ -1,6 +1,6 @@
 ---
 name: code-plan-editor
-description: Implementation plan lifecycle manager integrated with Plan mode. Pre-Plan preparation (context injection, existing plan scan) and Post-Plan reconciliation (converting Plan mode output into a structured plan file). Resolves the project's own plans/_TEMPLATE.md first, falls back to the built-in template. Triggers include "計画書", "実装計画", "implementation plan", "plan mode", "プラン作成", "計画の続き".
+description: 実装計画のライフサイクル管理。Plan mode の前（既存プラン走査）と後（出力を計画書ファイルへ整形）を担い、プロジェクトの plans/_TEMPLATE.md を優先して内蔵テンプレへ fallback する。Triggers include "計画を立てて", "計画書に落とす", "プランを書いて", "実装計画", "計画の続き", "plan mode を抜けた後", "implementation plan".
 ---
 
 # Skill: code-plan-editor

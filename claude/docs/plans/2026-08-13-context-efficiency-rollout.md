@@ -27,10 +27,15 @@
 - 併せて既定にする運用: 全読みが避けられない仕事（監査・整合性チェック・初版生成）はサブエージェントに出し、メイン会話は結論だけ受け取る。
 - 先行例: fantasy_novel の story-digest スキル（全体把握 約20万字 → 約1.1万字）。
 
-### P3. グローバル rules の常駐最小化（効果中・全プロジェクトに波及）
+### P3. グローバル rules の常駐最小化（効果中・全プロジェクトに波及） — **DONE（2026-08-16）**
 
 - 目的: claude-dotfiles の常駐 rules を「毎セッション本当に要るか」で仕分ける。skill-management / agent-management / plan-mode-quality は path-scoped 化済みなので、残りに同じ物差しを当てる。
 - 注意: 口調・応答方針のような挙動系ルール（tone 等）は常駐のままにする。paths: の /compact 後の再ロード制限も考慮する。
+
+**結果**: 実施計画は `2026-08-16-resident-context-diet.md`。常駐層 **36,527 B → 26,217 B（−10,310 B / −28%）**。内訳は CLAUDE.md 4,545→2,474、常駐 rules 8 本 12,747 B → 4 本 7,212 B、skill description 19 本 → 15 本で −2,693 B。output style（4,594 B）と agent description は予定どおり不変。挙動系の tone は常駐のまま残した。
+
+- 常駐 rules の残り 4 本: `tone` / `heavy-workflows` / `memory-boundary` / `skill-launch`。手順書は `docs/` と skills へ移し、判断基準だけを常駐に残す形に揃えた。
+- 未使用スキル 4 本は削除ではなく `claude/skills-archive/`（manifest 対象外）へ退避。戻す手順は同ディレクトリの README。
 
 ### P4. アーカイブ習慣（効果はトークンでなく誤読防止）
 

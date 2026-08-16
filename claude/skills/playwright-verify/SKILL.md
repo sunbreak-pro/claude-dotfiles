@@ -1,9 +1,7 @@
 ---
 name: playwright-verify
-description: Playwright MCP の実ブラウザ操作で UI 変更を runtime 検証する手順書。session-verifier（静的ゲート）の後段に置く動的ゲート。Use after implementing UI-visible changes (components, styles, screen behavior), when the user says "画面で確認して", "実際に動かして検証", "runtime verify", "playwright verify", "ブラウザで検証", or when lead-pipeline reaches the verification phase with UI-affecting diffs. 通常は playwright-ui-verifier エージェント（opus / xhigh）を Agent ツールで起動して実行させる。メイン直接実行は軽い単発確認のみ。
+description: Playwright MCP の実ブラウザ操作で UI 変更を runtime 検証する手順書。session-verifier（静的ゲート）の後段に置く動的ゲートで、通常は playwright-ui-verifier エージェント経由で実行する。Triggers include "画面で確認して", "実際に動かして検証", "ブラウザで検証", "runtime verify", "playwright verify", UI 差分を伴う lead-pipeline の検証フェーズ。
 ---
-
-MANDATORY FIRST ACTION: Output `<The playwright-verify will launch>` before doing anything else.
 
 # Playwright Verify — 実ブラウザ runtime 検証ゲート
 

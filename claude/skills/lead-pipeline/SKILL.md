@@ -1,6 +1,6 @@
 ---
 name: lead-pipeline
-description: 外来の実装タスクを受けた瞬間に、軽重ティアを判定して必要工程だけを一気通貫で采配するメインチャット用プレイブック。ultracode キーワード検出時はティア判定を省略し references/ultracode-mode.md の並列采配へ切り替える。sub-agent は再帰起動不可のため、メイン自身が Agent ツールで task-tracker / role-pm / execution-router / role-engineer / session-verifier / playwright-ui-verifier / role-qa / git-workflow を順に起動する。質問・調査・雑談では使わない。Triggers include "実装して", "作って", "機能追加", "直して", "修正", "fix", "implement", "feature", "refactor", "一気通貫", "lead pipeline", "ultracode", "ウルトラコード", "総力戦", "並列で全力", "全エージェント投入", "multi-agent orchestration".
+description: 外来の実装タスクを軽重ティア判定し、必要工程だけをメインチャットから一気通貫で采配するプレイブック（ultracode 検出時は references/ultracode-mode.md の並列采配へ切替）。質問・調査・雑談では使わない。Triggers include "実装して", "作って", "機能追加", "直して", "修正", "implement", "fix", "refactor", "一気通貫", "ultracode".
 ---
 
 # Lead Pipeline — 実装タスク一気通貫プレイブック
