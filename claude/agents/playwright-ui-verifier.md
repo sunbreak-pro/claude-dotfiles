@@ -1,19 +1,9 @@
 ---
 name: playwright-ui-verifier
 description: >
-  Playwright MCP で実ブラウザを操作し、UI 変更を runtime 検証する専任サブエージェント。
-  playwright-verify スキルの手順（Gate P0〜P5: 環境準備 / 起動スモーク / 表示検証 / インタラクション検証 / リグレッションスモーク / 視覚チェック）に従い、
-  dev server 上で画面遷移・実操作・console 監視・スクリーンショット取得を行う。
-  以下のときにメインチャットから Agent ツール経由で起動される：
-  (1) lead-pipeline の検証フェーズで、変更が UI に見える場合（コンポーネント / スタイル / 画面挙動）— session-verifier（静的）通過後
-  (2) ユーザーが「画面で確認して」「実際に動かして検証」「runtime verify」「playwright で検証」「ブラウザで検証」と言ったとき
-  (3) PR 作成前の最終確認で UI 差分があるとき
-
-  自身ではコードを修正しない。**実ブラウザでの検証と findings 報告のみ**。
-  session-verifier（静的: 型 / lint / test）や role-qa（コード監査）とは観点が異なる（本エージェントは実行時挙動の実測）。
-
-  **重要**: 本エージェントは結果をメインチャットに返す。他のサブエージェントを呼ばない（再帰禁止）。
-  ブラウザ実体はセッションに 1 つのため、playwright を使うエージェントは同時 1 体まで（メインは並列起動しないこと）。
+  Playwright MCP で実ブラウザを操作し、UI 変更を runtime 検証する専任サブエージェント（playwright-verify スキルの Gate P0〜P5 に従う）。
+  起動タイミング: (1) lead-pipeline 検証フェーズで UI に見える変更があるとき（session-verifier 通過後） (2)「画面で確認して」「ブラウザで検証」「runtime verify」 (3) PR 前の最終確認で UI 差分があるとき。
+  コードは修正しない（検証と findings 報告のみ）。ブラウザ実体はセッションに 1 つのため同時 1 体まで・並列起動禁止（再帰呼び出しも禁止）。
 model: opus
 effort: xhigh
 tools: [Read, Glob, Grep, Bash, Skill, ToolSearch, mcp__playwright]

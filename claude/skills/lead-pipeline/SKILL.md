@@ -46,7 +46,7 @@ description: 外来の実装タスクを受けた瞬間に、軽重ティアを�
 メインが Agent ツールで**逐次**起動（前段の出力が後段の入力）。各 sub-agent は結果をメインに返すだけ。
 
 ```
-0. task-tracker (skill, START)            ← multi-session-coordinator 競合チェック込み
+0. task-tracker (skill, START)            ← active-sessions 競合チェック込み
 1. role-pm (agent)                        ← 要件分解・スコープ・Tier 判定
 2. execution-router (skill)               ← /goal /batch /loop /subagent のどれで回すか判断
        └─ /goal /batch /loop が最適なら、コマンド文字列をユーザーに提示して指示を仰ぐ

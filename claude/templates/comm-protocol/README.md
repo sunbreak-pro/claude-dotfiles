@@ -191,6 +191,6 @@ cp -r ~/.claude/templates/comm-protocol <project-root>/.claude/comm
 
 - **Phase 2**: SessionStart hook で他 outbox を自動 cat
 - **Phase 3**: 共有 Inbox（append-only ログ）追加
-- **Phase 4**: Shared State + ロック機構（multi-session-coordinator と統合）
+- **Phase 4**: Shared State + ロック機構（task-tracker の active-sessions 照会と統合）
 
 Phase 1 を運用してみて不便を感じたら次フェーズへ。

@@ -75,7 +75,7 @@ refactor/dataservice-extract-cache
 1. 紐付く PR が MERGED 済 **かつ**
 2. `git -C <wt> log origin/main..HEAD --oneline` が空（未マージ commit なし） **かつ**
 3. `git -C <wt> status -s` が空（dirty なし） **かつ**
-4. **その worktree を cwd とする稼働セッションが存在しない** — multi-session-coordinator の Layer 1（`claude agents --json`）で確認。git mtime / PR / reflog だけで「inactive」と判断するのは禁止（最も信頼できる活動シグナルは稼働中プロセス）
+4. **その worktree を cwd とする稼働セッションが存在しない** — `claude agents --json` で稼働セッション一覧を取得して確認。git mtime / PR / reflog だけで「inactive」と判断するのは禁止（最も信頼できる活動シグナルは稼働中プロセス）
 
 4 つ揃わない場合は作業中の可能性があるため `.claude/memory/INDEX.md` と `.claude/comm/outbox/` も確認してから判断する。
 

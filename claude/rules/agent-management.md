@@ -44,6 +44,12 @@ Claude は description を元に自動起動を判断する。曖昧な記述は
 2. YAML frontmatter に `name` / `description` / `tools` / `model` / `effort` / `permissionMode` を記述する
 3. 保存した時点で `~/.claude/agents` 経由で有効になる。リンク作業・インデックス更新は不要
 
+## 定期棚卸し（メタハーネス観測ループ・`docs/meta-harness.md` 原則 3）
+
+- 半年ごと、または構成を見直したくなったときに、harness-reflect スキルで起動実績を集計する
+- 2 ヶ月連続で起動ゼロのエージェントは削除候補に挙げ、ユーザー判断を仰ぐ
+- description は「1 行要約 + 起動条件 + 非対象」で 80〜150 tokens 目安（skill-management.md と同基準）。**description は毎セッション常駐する固定費**なので、詳細は本文（起動時のみロード）へ置く
+
 ## 非活性化
 
 不要になったエージェントは frontmatter の `description` を絞って自動起動を止めるか、ファイルごと削除する。`~/.claude/agents` はディレクトリごとのリンクなので、リポジトリ側の削除がそのまま反映される（別途リンクを外す作業は不要）。
