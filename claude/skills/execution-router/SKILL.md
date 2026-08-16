@@ -1,6 +1,6 @@
 ---
 name: execution-router
-description: 実行戦略のオーケストレーター判断ガイド。長時間・反復・並列・条件達成型の作業に対し /goal・/batch・/loop・subagent・/background・/simplify・/ultrareview のどれを使うべきか判断し、ユーザーが貼るコマンド文字列を具体的に提案する。既存 role-* agent / session-verifier / git-workflow / task-tracker と連携。Triggers include "全部通るまで", "回し続けて", "自動で進めて", "一括置換", "全置換", "並列で", "リポジトリ全体", "定期的に", "ずっと監視", "放置で", "長時間タスク", "どうやって回す", "goal", "batch", "loop", "auto run", "long running", "parallelize".
+description: 長時間・反復・並列・条件達成型の作業に /goal・/batch・/loop・subagent・/background のどれを使うか判断し、ユーザーが貼り付けるコマンド文字列を提示する実行戦略ルーター。Triggers include "全部通るまで", "回し続けて", "一括置換", "並列で", "定期的に", "放置で", "長時間タスク", "goal", "batch", "loop".
 ---
 
 # Execution Router — 実行戦略の判断ガイド

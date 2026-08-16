@@ -95,7 +95,7 @@ symlink でインストールされた項目は `~/.claude/` 越しの編集が�
   `~/dev/Claude/skill-lib|agents-lib` への symlink ファーム運用だった。本 repo には
   その実体をコピーしてある。Mac で `install.mjs` を実行すると symlink ファームは
   `.bak` に退避され、**以後の SSOT はこの repo になる**（lib 側は更新されない）。
-- `skills/code-refactoring/scripts/init_lang_refactoring.sh` はスキル内部の補助
-  スクリプトで Windows ネイティブでは動かない（スキル本体の参照資料としては機能する）。
+- `skills-archive/code-refactoring/scripts/init_lang_refactoring.sh` はスキル内部の
+  補助スクリプトで Windows ネイティブでは動かない（退避済みなので現状は未配布）。
 - `settings.json` の `model` / `effortLevel` 等もそのまま共有される。マシンごとに
   変えたい場合は `settings.local.json`（非共有）で上書きする。
