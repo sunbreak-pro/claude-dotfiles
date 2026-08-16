@@ -1,6 +1,6 @@
 {
   "permissions": {
-    "allow": ["Edit", "Write", "Bash(*)", "WebSearch", "mcp__pencil"],
+    "allow": ["Edit", "Write", "WebSearch", "mcp__pencil"],
     "deny": [
       "Bash(rm -rf *)",
       "Bash(git push --force *)",
@@ -9,8 +9,22 @@
     ],
     "defaultMode": "auto"
   },
-  "model": "claude-opus-5",
-  "outputStyle": "tone-persona",
+  "model": "Opus",
+  "autoMode": {
+    "environment": [
+      "$defaults",
+      "**Organization**: none — individual developer. **Primary use of Claude Code**: software development, plus managing Claude Code's own dotfiles/config.",
+      "**Org-specific CLIs**: none. Routine CLIs are git, npm, gh, node, supabase, claude — all generic tooling.",
+      "**Internal sharing / snippet hosting**: none configured. Public paste and gist services stay outside the trust boundary.",
+      "Repo: sunbreak-pro/claude-dotfiles (private, github.com) — Claude Code's own global config. Routine git / npm / gh operations inside its working directory are in scope. Private visibility clears confidential material for this repo only; it never clears secrets or credentials.",
+      "Repo: sunbreak-pro/life-editor (PUBLIC, github.com) — React/TypeScript + Supabase personal-OS app, packaged with Electron/Capacitor. Public visibility means only this repo's own work may be pushed there; secrets and personal data are never cleared by visibility.",
+      "**Cloud provider(s)** (life-editor only): Supabase (Postgres + Auth + Realtime) and Cloudflare (CI secrets CLOUDFLARE_ACCOUNT_ID / CLOUDFLARE_API_TOKEN).",
+      "**Key internal services** (life-editor only): the Supabase project this repo uses, reached via LIFE_EDITOR_SUPABASE_URL / LIFE_EDITOR_SUPABASE_ANON_KEY.",
+      "**Secrets management**: local .env files only — .env, .env.local, .env.*.local and supabase/.env are gitignored and must never be committed or pushed. CI secrets (CLOUDFLARE_ACCOUNT_ID, CLOUDFLARE_API_TOKEN, VITE_SUPABASE_ANON_KEY, VITE_SUPABASE_URL) are referenced by name only in GitHub Actions.",
+      "**Sensitive data locations & audiences**: the .env files above, plus anything matched by the dotfiles .gitignore (.credentials.json, *credentials*, *.key, .env*). Personal life-tracking data held in life-editor's Supabase Postgres is personal data — share only with the user themselves.",
+      "**Protected deployment namespaces / environments**: none configured for either repo, so the `prod` / `production` heuristic under Sensitive remote targets applies unchanged."
+    ]
+  },
   "hooks": {
     "UserPromptSubmit": [
       {
@@ -25,6 +39,15 @@
             "command": "node {{CLAUDE_DIR}}/hooks/graphify-nudge.mjs"
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ -f 'C:/Users/user/.orca/agent-hooks/claude-hook.cmd' ]; then 'C:/Users/user/.orca/agent-hooks/claude-hook.cmd'; else { command -p cat 2>/dev/null || cat; } >/dev/null 2>&1 || :; fi",
+            "timeout": 10
+          }
+        ]
       }
     ],
     "PostToolUse": [
@@ -34,6 +57,16 @@
           {
             "type": "command",
             "command": "node {{CLAUDE_DIR}}/hooks/post-edit-prettier.mjs"
+          }
+        ]
+      },
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ -f 'C:/Users/user/.orca/agent-hooks/claude-hook.cmd' ]; then 'C:/Users/user/.orca/agent-hooks/claude-hook.cmd'; else { command -p cat 2>/dev/null || cat; } >/dev/null 2>&1 || :; fi",
+            "timeout": 10
           }
         ]
       }
@@ -56,6 +89,16 @@
             "command": "node {{CLAUDE_DIR}}/hooks/skill-launch-notice.mjs"
           }
         ]
+      },
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ -f 'C:/Users/user/.orca/agent-hooks/claude-hook.cmd' ]; then 'C:/Users/user/.orca/agent-hooks/claude-hook.cmd'; else { command -p cat 2>/dev/null || cat; } >/dev/null 2>&1 || :; fi",
+            "timeout": 10
+          }
+        ]
       }
     ],
     "SessionStart": [
@@ -66,6 +109,15 @@
             "type": "command",
             "command": "node {{CLAUDE_DIR}}/hooks/sui-memory.mjs recall",
             "timeout": 30000
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ -f 'C:/Users/user/.orca/agent-hooks/claude-hook.cmd' ]; then 'C:/Users/user/.orca/agent-hooks/claude-hook.cmd'; else { command -p cat 2>/dev/null || cat; } >/dev/null 2>&1 || :; fi",
+            "timeout": 10
           }
         ]
       }
@@ -80,6 +132,15 @@
             "timeout": 60000
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ -f 'C:/Users/user/.orca/agent-hooks/claude-hook.cmd' ]; then 'C:/Users/user/.orca/agent-hooks/claude-hook.cmd'; else { command -p cat 2>/dev/null || cat; } >/dev/null 2>&1 || :; fi",
+            "timeout": 10
+          }
+        ]
       }
     ],
     "Notification": [
@@ -92,6 +153,74 @@
           }
         ]
       }
+    ],
+    "StopFailure": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ -f 'C:/Users/user/.orca/agent-hooks/claude-hook.cmd' ]; then 'C:/Users/user/.orca/agent-hooks/claude-hook.cmd'; else { command -p cat 2>/dev/null || cat; } >/dev/null 2>&1 || :; fi",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "SubagentStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ -f 'C:/Users/user/.orca/agent-hooks/claude-hook.cmd' ]; then 'C:/Users/user/.orca/agent-hooks/claude-hook.cmd'; else { command -p cat 2>/dev/null || cat; } >/dev/null 2>&1 || :; fi",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ -f 'C:/Users/user/.orca/agent-hooks/claude-hook.cmd' ]; then 'C:/Users/user/.orca/agent-hooks/claude-hook.cmd'; else { command -p cat 2>/dev/null || cat; } >/dev/null 2>&1 || :; fi",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "TeammateIdle": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ -f 'C:/Users/user/.orca/agent-hooks/claude-hook.cmd' ]; then 'C:/Users/user/.orca/agent-hooks/claude-hook.cmd'; else { command -p cat 2>/dev/null || cat; } >/dev/null 2>&1 || :; fi",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostToolUseFailure": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ -f 'C:/Users/user/.orca/agent-hooks/claude-hook.cmd' ]; then 'C:/Users/user/.orca/agent-hooks/claude-hook.cmd'; else { command -p cat 2>/dev/null || cat; } >/dev/null 2>&1 || :; fi",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PermissionRequest": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ -f 'C:/Users/user/.orca/agent-hooks/claude-hook.cmd' ]; then 'C:/Users/user/.orca/agent-hooks/claude-hook.cmd'; else { command -p cat 2>/dev/null || cat; } >/dev/null 2>&1 || :; fi",
+            "timeout": 10
+          }
+        ]
+      }
     ]
   },
   "statusLine": {
@@ -99,10 +228,13 @@
     "command": "node {{CLAUDE_DIR}}/statusline-command.mjs"
   },
   "enabledPlugins": {},
+  "outputStyle": "tone-persona",
   "alwaysThinkingEnabled": true,
   "effortLevel": "high",
+  "skipDangerousModePermissionPrompt": true,
   "skipWorkflowUsageWarning": true,
   "remoteControlAtStartup": true,
+  "inputNeededNotifEnabled": true,
   "agentPushNotifEnabled": true,
   "skipAutoPermissionPrompt": true
 }

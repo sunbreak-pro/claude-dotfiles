@@ -7,26 +7,28 @@
 .env.*
 
 # Claude Code runtime state（万一 repo 内に紛れ込んでも追跡しない）
-cache/
-sessions/
-session-env/
-shell-snapshots/
-projects/
-history.jsonl
-ide/
-backups/
-downloads/
-todos/
-file-history/
-paste-cache/
-plans/
-plugins/
-tasks/
-usage-data/
-chrome/
-debug/
-stats-cache.json
-mcp-needs-auth-cache.json
+# 先頭の / は必須。付けないと同名ディレクトリを深さ問わず巻き込む
+# （実例: `plans/` が claude/docs/plans/ を丸ごと無視していた）
+/cache/
+/sessions/
+/session-env/
+/shell-snapshots/
+/projects/
+/history.jsonl
+/ide/
+/backups/
+/downloads/
+/todos/
+/file-history/
+/paste-cache/
+/plans/
+/plugins/
+/tasks/
+/usage-data/
+/chrome/
+/debug/
+/stats-cache.json
+/mcp-needs-auth-cache.json
 .last-*
 settings.local.json
 
