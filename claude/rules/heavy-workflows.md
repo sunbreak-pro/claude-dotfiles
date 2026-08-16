@@ -10,12 +10,7 @@
 - 重量級（機能追加 / 層横断 / 影響範囲不明）かつ独立単位への並列分解が効くタスクでは、**プロンプトに `ultracode` を付けて送り直す**ことを 1 行で提案する（マルチエージェント・オーケストレーションへのオプトイン）
 - ultracode が既にプロンプトに含まれる場合は提案不要。lead-pipeline の ultracode モード（references/ultracode-mode.md）に従う（pipeline-gate hook が注入する）
 
-## /loop 即貼りテンプレ
-
-- CI babysit: `/loop 5m check the latest CI run on this branch; if it failed, diagnose and push a fix`
-- PR レビュー対応: `/loop 10m check PR #<n> for new review comments and address them`
-- 品質ループ: `/loop 30m run /code-review low on the current diff and fix all Blocking findings`
-- 定期検証: `/loop 15m run the test suite; report only on failure`
+即貼りテンプレ集は `skills/execution-router/SKILL.md` §`/loop` 即貼りテンプレ（提案する瞬間にしか要らないので常駐から外した）。
 
 ## 安全則
 

@@ -14,6 +14,7 @@
 - セッション開始時はプロジェクトの `.claude/CLAUDE.md` と `.claude/skills/` を先に確認し、既存コードを読んでから変更する
 - ネイティブツール（Glob / Grep / Read / Edit）を bash（find / grep / cat / sed）より優先し、独立した操作は並列で呼ぶ
 - 新しい要件を受けたら実装前に「意図 / スコープ / 曖昧な仮定」を確認する。確認の形式は `ask-user` スキル、重ティアの要件分解は `role-pm` エージェント（起動判断は `lead-pipeline`）
+- ツール実行直後にハングしたら ESC で復帰する。原因は Claude Code 本体の SSE バグで、hook / MCP / ローカル環境を疑う調査は無駄（対処フロー: `docs/bash-tool-stability.md`）
 
 ## Code Conventions
 

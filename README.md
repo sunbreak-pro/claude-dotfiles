@@ -85,7 +85,9 @@ symlink でインストールされた項目は `~/.claude/` 越しの編集が�
 - `.credentials.json` / `history.jsonl` / `sessions/` / `session-env/` / `projects/` /
   `cache/` / `backups/` / `shell-snapshots/` / `ide/` / `plugins/` / `stats-cache.json` /
   `mcp-needs-auth-cache.json` / `.last-*` ほか runtime state 全般（.gitignore 参照）
-- `sui-memory` 本体（`~/dev/Claude/sui-memory/`）… Mac 専用。hook ラッパーが無いマシンでは自動 no-op
+- `sui-memory` 本体（`~/dev/Claude/sui-memory/`）… Mac 専用。hook ラッパーが無いマシンでは自動 no-op。
+  Windows 機には未インストールのため `hooks/sui-memory.mjs` は素通りし、recall / save は実際には何もしていない
+  （責務境界の宣言は `claude/rules/memory-boundary.md`）
 
 ## 既知の注意点
 

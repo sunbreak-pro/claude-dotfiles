@@ -36,7 +36,7 @@ cd ~/.claude/projects && grep -h '"name":"Skill"' */*.jsonl 2>/dev/null |
 ### 障害・摩擦の痕跡
 
 ```bash
-# SSE ハング系統（詳細は rules/bash-tool-stability.md）
+# SSE ハング系統（詳細は docs/bash-tool-stability.md）
 grep -hE 'ECONNRESET|terminated|"status":529|Overloaded' ~/.claude/projects/*/*.jsonl 2>/dev/null | wc -l
 # hook 失敗
 grep -hE 'hook.*(error|failed|non-zero)' ~/.claude/projects/*/*.jsonl 2>/dev/null | wc -l

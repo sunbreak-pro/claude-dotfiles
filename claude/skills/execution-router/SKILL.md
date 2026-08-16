@@ -68,9 +68,18 @@ description: 実行戦略のオーケストレーター判断ガイド。長時�
   例: `/goal all tests under frontend/src pass and `npm run build` is clean`
 - `/batch` … **何を→何に**を 1 文で。分解は /batch 側が行う。
   例: `/batch replace all moment.js imports with dayjs across the repo, updating call sites to dayjs syntax`
-- `/loop` … 間隔 + 実行内容。即貼りテンプレ集は [[heavy-workflows]] ルール参照。
-  例: `/loop 5m check the latest GitHub Actions run on this branch and report only on failure`
+- `/loop` … 間隔 + 実行内容。下の即貼りテンプレから選ぶ。
 - `ultracode` … スラッシュコマンドではなく**プロンプトに含めるキーワード**。提案の可否・並列采配の中身は `lead-pipeline`（`references/ultracode-mode.md`）が正本。
+
+### `/loop` 即貼りテンプレ
+
+- CI babysit: `/loop 5m check the latest CI run on this branch; if it failed, diagnose and push a fix`
+- 監視のみ: `/loop 5m check the latest GitHub Actions run on this branch and report only on failure`
+- PR レビュー対応: `/loop 10m check PR #<n> for new review comments and address them`
+- 品質ループ: `/loop 30m run /code-review low on the current diff and fix all Blocking findings`
+- 定期検証: `/loop 15m run the test suite; report only on failure`
+
+どれを出すときも「いつ止めるか」を 1 行添える（`rules/heavy-workflows.md` の安全則）。
 
 ## 安全則（必須）
 
