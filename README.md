@@ -12,12 +12,13 @@ claude-dotfiles/
 │   ├── settings.json        # テンプレート（{{CLAUDE_DIR}} を install 時に実パス展開）
 │   ├── statusline-command.mjs
 │   ├── hooks/               # 全 hook（Node 製・クロスプラットフォーム）
-│   ├── rules/               # グローバルルール (11 ファイル)
+│   ├── rules/               # グローバルルール (7 ファイル・うち 3 本は paths: 付きで非常駐)
 │   ├── agents/              # グローバルエージェント定義 (7 ファイル)
 │   ├── skills/              # グローバルスキル (15 個)
-│   ├── docs/                # hooks_guide.md
+│   ├── docs/                # hooks_guide.md / meta-harness.md / bash-tool-stability.md / plans/
 │   ├── output-styles/       # 口調 output style（tone-persona・常時有効化）
 │   └── templates/           # comm-protocol テンプレート
+├── claude/skills-archive/   # 退避スキル (4 個)。manifest 対象外＝ ~/.claude へ配らない
 ├── manifest.json            # リンク対象一覧（src → ~/.claude/<dest> + mode）
 ├── install.mjs              # インストーラ（symlink、失敗時 copy フォールバック）
 ├── .gitignore

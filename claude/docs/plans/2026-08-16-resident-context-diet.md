@@ -1,6 +1,6 @@
 # Plan: 常駐コンテキストの棚卸しと痩身
 
-- **Status**: PLANNED（2026-08-16 ユーザー判断: 未使用スキルは archive 退避 / 計画書を書いてから着手）
+- **Status**: COMPLETED（2026-08-16 実施・Phase A〜E 完了。D-1 / D-2 の `~/.claude` 清掃のみユーザー確認待ち）
 - **Created**: 2026-08-16
 - **Project**: claude-dotfiles
 - **位置づけ**: `docs/plans/2026-08-13-context-efficiency-rollout.md` の **P3（グローバル rules の常駐最小化）の実施計画**。設計原則の正本は `docs/meta-harness.md`（特に原則 2「自由の原資はコンテキストの余白」・原則 4「規範は宣言、強制は決定論」）。
@@ -12,29 +12,29 @@
 
 「毎セッション必ず読まれるもの」= CLAUDE.md ＋ `paths:` 無し rules ＋ output style ＋ skill/agent description。
 
-| 区分                    | 内訳                                                                              | サイズ    |
-| ----------------------- | --------------------------------------------------------------------------------- | --------- |
-| `claude/CLAUDE.md`      | 61 行                                                                             | 4,545 B   |
-| output style            | `output-styles/tone-persona.md`（settings.json で常時有効）                       | 4,594 B   |
-| rules（`paths:` 無し 8 本） | tone 4,711 / bash-tool-stability 3,160 / heavy-workflows 2,191 / memory-boundary 1,036 / skill-launch 801 / conversation-workflow 555 / tool-usage 165 / session-start 128 | 12,747 B  |
-| skill description × 19  | 最大 lead-pipeline 886 B、次いで execution-router 718 B                          | 約 8,900 B |
-| agent description × 7   | 最大 deep-web-research 855 B                                                     | 約 5,119 B |
-| **合計**                |                                                                                   | **約 36KB** |
+| 区分                        | 内訳                                                                                                                                                                       | サイズ      |
+| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| `claude/CLAUDE.md`          | 61 行                                                                                                                                                                      | 4,545 B     |
+| output style                | `output-styles/tone-persona.md`（settings.json で常時有効）                                                                                                                | 4,594 B     |
+| rules（`paths:` 無し 8 本） | tone 4,711 / bash-tool-stability 3,160 / heavy-workflows 2,191 / memory-boundary 1,036 / skill-launch 801 / conversation-workflow 555 / tool-usage 165 / session-start 128 | 12,747 B    |
+| skill description × 19      | 最大 lead-pipeline 886 B、次いで execution-router 718 B                                                                                                                    | 約 8,900 B  |
+| agent description × 7       | 最大 deep-web-research 855 B                                                                                                                                               | 約 5,119 B  |
+| **合計**                    |                                                                                                                                                                            | **約 36KB** |
 
 `paths:` 付きの 3 本（`agent-management` / `skill-management` / `plan-mode-quality`）は既にオンデマンド化済みで、本調査セッションでも常駐していないことを確認した。P3 の残作業は上記 8 本と CLAUDE.md 本体。
 
 ### スキル起動実績（`~/.claude/projects/**/*.jsonl` 全走査、2026-07〜08 の 2 か月・約 700 セッション）
 
-| スキル                                                          | 7 月 | 8 月 | 判定                                    |
-| --------------------------------------------------------------- | ---- | ---- | --------------------------------------- |
-| task-tracker                                                    | 44   | 57   | 中核                                    |
-| session-verifier                                                | 16   | 44   | 中核                                    |
-| lead-pipeline / execution-router / code-review / git-workflow   | 8/4/6/7 | 6/8/5/3 | 現役                                |
-| ask-user / git-branch-flow / git-conflict-resolver              | 1/2/1 | 3/1/1 | 少ないが現役                          |
-| graphify / efficient-codebase-nav / playwright-verify           | 0    | 各 1 | 実績ほぼゼロ（後 2 者は 8/10 追加で判定保留） |
-| **code-teacher / code-refactoring / debug-strategy / life-editor-mcp** | 0 | 0 | **2 か月ゼロ**（いずれも 6/10 作成）    |
-| code-plan-editor                                                | 0    | 0    | **2 か月ゼロ**（`plan-mode-quality` が正本として参照中） |
-| project-setter / harness-reflect                                | 0    | 0    | 用途上まれ（8/06）/ 新設直後（8/13）で判定不能 |
+| スキル                                                                 | 7 月    | 8 月    | 判定                                                     |
+| ---------------------------------------------------------------------- | ------- | ------- | -------------------------------------------------------- |
+| task-tracker                                                           | 44      | 57      | 中核                                                     |
+| session-verifier                                                       | 16      | 44      | 中核                                                     |
+| lead-pipeline / execution-router / code-review / git-workflow          | 8/4/6/7 | 6/8/5/3 | 現役                                                     |
+| ask-user / git-branch-flow / git-conflict-resolver                     | 1/2/1   | 3/1/1   | 少ないが現役                                             |
+| graphify / efficient-codebase-nav / playwright-verify                  | 0       | 各 1    | 実績ほぼゼロ（後 2 者は 8/10 追加で判定保留）            |
+| **code-teacher / code-refactoring / debug-strategy / life-editor-mcp** | 0       | 0       | **2 か月ゼロ**（いずれも 6/10 作成）                     |
+| code-plan-editor                                                       | 0       | 0       | **2 か月ゼロ**（`plan-mode-quality` が正本として参照中） |
+| project-setter / harness-reflect                                       | 0       | 0       | 用途上まれ（8/06）/ 新設直後（8/13）で判定不能           |
 
 ### 問題
 
@@ -47,13 +47,13 @@
 
 ## 検討した代替案
 
-| 案                                                     | 採否 | 理由                                                                                             | 復活条件                        |
-| ------------------------------------------------------ | ---- | ------------------------------------------------------------------------------------------------ | ------------------------------- |
-| A: 重複解消 → 常駐外し → スキル退避 の 3 段階          | ✓    | 移送先が既にある順に処理でき、各段階が独立して差し戻せる                                        | —                               |
-| B: rules を全面リライトして数本に統合                  | ✗    | meta-harness が明示的に禁じている（「全面リライト運動はしない。摩擦シグナルが指した箇所だけ」） | —                               |
-| C: 未使用スキルを削除                                  | ✗    | 2026-08-16 ユーザー判断で archive 退避を選択。削減効果は同じで復帰可能性が残る                   | archive が溜まって邪魔になったら |
-| D: `rules/skill-launch.md`(801B) も削除し hook だけに   | 保留 | hook（`skill-launch-notice.mjs`）が強制済みで原則 4 上は削れるが、宣言の正本が消えると hook の意図が読めなくなる。Phase B で 2〜3 行に圧縮するに留める | —                               |
-| E: `graphify-out/` を消して毎プロンプト注入を止める     | 保留 | 別リポジトリの運用にも関わるため本計画のスコープ外。Phase D で提案のみ                          | ユーザー判断が出たら            |
+| 案                                                    | 採否 | 理由                                                                                                                                                   | 復活条件                         |
+| ----------------------------------------------------- | ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------- |
+| A: 重複解消 → 常駐外し → スキル退避 の 3 段階         | ✓    | 移送先が既にある順に処理でき、各段階が独立して差し戻せる                                                                                               | —                                |
+| B: rules を全面リライトして数本に統合                 | ✗    | meta-harness が明示的に禁じている（「全面リライト運動はしない。摩擦シグナルが指した箇所だけ」）                                                        | —                                |
+| C: 未使用スキルを削除                                 | ✗    | 2026-08-16 ユーザー判断で archive 退避を選択。削減効果は同じで復帰可能性が残る                                                                         | archive が溜まって邪魔になったら |
+| D: `rules/skill-launch.md`(801B) も削除し hook だけに | 保留 | hook（`skill-launch-notice.mjs`）が強制済みで原則 4 上は削れるが、宣言の正本が消えると hook の意図が読めなくなる。Phase B で 2〜3 行に圧縮するに留める | —                                |
+| E: `graphify-out/` を消して毎プロンプト注入を止める   | 保留 | 別リポジトリの運用にも関わるため本計画のスコープ外。Phase D で提案のみ                                                                                 | ユーザー判断が出たら             |
 
 ## Scope (Touchable Paths)
 
@@ -105,22 +105,22 @@
 
 ## Files
 
-| ファイル                                          | 変更                                          |
-| ------------------------------------------------- | --------------------------------------------- |
-| `claude/CLAUDE.md`                                | 34〜57 行削除 / 口調要約削除 / rules 3 本を統合 |
-| `claude/rules/tone.md`                            | 重複節の圧縮                                  |
-| `claude/rules/session-start.md`                   | 削除（CLAUDE.md へ統合）                      |
-| `claude/rules/tool-usage.md`                      | 削除（同上）                                  |
-| `claude/rules/conversation-workflow.md`           | 削除（同上）                                  |
-| `claude/rules/bash-tool-stability.md`             | 削除 → `claude/docs/bash-tool-stability.md`  |
-| `claude/rules/heavy-workflows.md`                 | テンプレを execution-router へ移送            |
-| `claude/rules/memory-boundary.md`                 | 3 行に圧縮                                    |
-| `claude/rules/skill-launch.md`                    | 2〜3 行に圧縮                                 |
-| `claude/skills-archive/`（新設）                  | 未使用スキル 4 本の退避先                     |
-| `claude/skills/execution-router/SKILL.md`         | `/loop` テンプレ受け入れ                      |
-| `claude/skills/harness-reflect/SKILL.md`          | 計測手順の追記                                |
-| `claude/docs/plans/2026-08-13-context-efficiency-rollout.md` | P3 を DONE に更新                  |
-| `README.md`                                       | 構成表の実態合わせ                            |
+| ファイル                                                     | 変更                                            |
+| ------------------------------------------------------------ | ----------------------------------------------- |
+| `claude/CLAUDE.md`                                           | 34〜57 行削除 / 口調要約削除 / rules 3 本を統合 |
+| `claude/rules/tone.md`                                       | 重複節の圧縮                                    |
+| `claude/rules/session-start.md`                              | 削除（CLAUDE.md へ統合）                        |
+| `claude/rules/tool-usage.md`                                 | 削除（同上）                                    |
+| `claude/rules/conversation-workflow.md`                      | 削除（同上）                                    |
+| `claude/rules/bash-tool-stability.md`                        | 削除 → `claude/docs/bash-tool-stability.md`     |
+| `claude/rules/heavy-workflows.md`                            | テンプレを execution-router へ移送              |
+| `claude/rules/memory-boundary.md`                            | 3 行に圧縮                                      |
+| `claude/rules/skill-launch.md`                               | 2〜3 行に圧縮                                   |
+| `claude/skills-archive/`（新設）                             | 未使用スキル 4 本の退避先                       |
+| `claude/skills/execution-router/SKILL.md`                    | `/loop` テンプレ受け入れ                        |
+| `claude/skills/harness-reflect/SKILL.md`                     | 計測手順の追記                                  |
+| `claude/docs/plans/2026-08-13-context-efficiency-rollout.md` | P3 を DONE に更新                               |
+| `README.md`                                                  | 構成表の実態合わせ                              |
 
 ## Verification
 
@@ -130,3 +130,35 @@
 - **実効確認**: `node install.mjs` を再実行し、`~/.claude/skills/` に `skills-archive` が配られていないこと、削除した rules が `~/.claude/rules/` から消えていることを確認
 - **体感確認**: 新規セッションを 1 本開き、システムプロンプトに退避したスキルの description と削除した rules が現れないことを目視する
 - **コミット単位**: Phase ごとに 1 コミット（A / B / C / D / E）。ブランチは新規に切る（現在の `chore/agent-portfolio-and-meta-harness` は 8/13 計画の実装中のため混ぜない）
+
+## 実施結果（2026-08-16）
+
+ブランチ `chore/resident-context-diet`。計測は同一スクリプト（CLAUDE.md ＋ output style ＋ `paths:` 無し rules ＋ skill / agent description のバイト合計）を実施前コミット `c91d73e` と実施後で回した。
+
+| 区分                             | Before        | After        | 差                    |
+| -------------------------------- | ------------- | ------------ | --------------------- |
+| `claude/CLAUDE.md`               | 4,545 B       | 2,474 B      | −2,071 B              |
+| 常駐 rules                       | 8 本 12,747 B | 4 本 7,212 B | −5,535 B              |
+| skill description                | 19 本         | 15 本        | −2,693 B              |
+| output style / agent description | 変更なし      | 変更なし     | 0                     |
+| **合計**                         | **36,527 B**  | **26,217 B** | **−10,310 B（−28%）** |
+
+目標レンジ（25〜26KB）にほぼ着地。回帰確認は全て通過:
+
+- `paths:` 無し rules は `tone` / `heavy-workflows` / `memory-boundary` / `skill-launch` の 4 本
+- 削除・移動したファイル名の全文検索で宙に浮いた参照ゼロ
+- `node install.mjs` 再実行で `~/.claude/skills/` に `skills-archive` が配られず、削除した rules も `~/.claude/rules/` から消えていることを確認（`.bak` の増殖なし）
+
+### 計画からの逸脱
+
+- **`claude/agents/role-engineer.md` を 1 行だけ触った**（Scope の「触らない」に反する）。frontmatter の `skills:` に `code-refactoring` が載っており、退避で参照先が消えるため。8/13 計画のポートフォリオ判断には踏み込んでいない。
+- **`skills/playwright-verify/SKILL.md` の `MANDATORY FIRST ACTION` 行を削除**。`rules/skill-launch.md` が「個々の SKILL.md 本文には書かない」と宣言しているのに残っていた転記。C-4 で description を触るついでに解消した。
+
+### D-1 / D-2 の現況（ユーザー確認待ち）
+
+- 死んだ symlink は実測 **9 本**（計画の記載は 15 本）。全て `~/dev/claude-dotfiles`（不在）を指す `*.bak`: `agents` `CLAUDE.md` `docs` `hooks` `output-styles` `rules` `skills` `statusline-command.mjs` `templates`
+- `settings.json.bak` は **7 本**（`.bak` 〜 `.bak.6`）。最新 `.bak.6`（8/16 17:45・11,229 B）は今日の install で退避された旧ライブ設定なので、これだけ残すのが妥当
+
+### D-4: `graphify-out/` の提案（ユーザー判断待ち）
+
+`hooks/graphify-nudge.mjs` が `graphify-out/graph.json` のある repo で毎プロンプト約 350 字を注入している。本リポジトリのグラフは 2026-07-28 生成で、graphify スキルの起動実績は通算 1 回。**このリポジトリでは注入コストが実績に見合っていない**ため、`graphify-out/` の削除か nudge の対象外化を提案する。他リポジトリの運用には影響しない。

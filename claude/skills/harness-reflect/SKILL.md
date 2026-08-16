@@ -28,9 +28,18 @@ cd ~/.claude/projects && grep -h '"subagent_type"' */*.jsonl 2>/dev/null |
 
 ### スキル起動実績（月次）
 
+月ごとに分けないと「先月まで使っていて今月止まった」のか「ずっとゼロ」なのかが判別できない。判定基準（2 ヶ月連続ゼロ）は月次でしか測れないので、必ず月と組にする。
+
 ```bash
 cd ~/.claude/projects && grep -h '"name":"Skill"' */*.jsonl 2>/dev/null |
-  grep -oE '"skill" *: *"[a-z0-9-]+"' | sort | uniq -c | sort -rn
+  sed -E 's/.*"skill" *: *"([a-z0-9-]+)".*"timestamp" *: *"([0-9]{4}-[0-9]{2}).*/\1 \2/' |
+  grep -E '^[a-z0-9-]+ [0-9]{4}-[0-9]{2}$' | sort | uniq -c | sort -rn
+```
+
+起動ゼロを見つけるには「実績に出てこないスキル」を引く（grep は無いものを数えられない）:
+
+```bash
+comm -23 <(ls <dotfiles>/claude/skills | sort) <(上のコマンド | awk '{print $2}' | sort -u)
 ```
 
 ### 障害・摩擦の痕跡
@@ -44,24 +53,31 @@ grep -hE 'hook.*(error|failed|non-zero)' ~/.claude/projects/*/*.jsonl 2>/dev/nul
 
 ### 常駐コストの実測
 
+「毎セッション必ず読まれるもの」= CLAUDE.md ＋ `paths:` 無し rules ＋ output style ＋ skill / agent の description。行数ではなく**バイト数**で測る（description は 1 行に長文が入るため、行数だと実態を映さない）。
+
 ```bash
-# agent description の行数（frontmatter description は毎セッション常駐する固定費）
-cd <dotfiles>/claude/agents && for f in *.md; do
-  awk '/^description:/{d=1} d&&/^[a-z]+:/&&!/^description:/{exit} d{n++} END{print n, FILENAME}' "$f"
+cd <dotfiles>
+# ファイル系（CLAUDE.md + 常駐 rules + output style）
+wc -c claude/CLAUDE.md claude/output-styles/*.md
+for f in claude/rules/*.md; do grep -q 'paths:' "$f" || wc -c "$f"; done
+# description 系（skills / agents とも同じ抽出でバイト数を出す）
+for f in claude/skills/*/SKILL.md claude/agents/*.md; do
+  d=$(awk '/^description:/{flag=1} flag{print} /^---$/{if(NR>1 && flag) exit}' "$f" | sed '$d')
+  echo "$(echo -n "$d" | wc -c)  $f"
 done | sort -rn
-# 常駐 rules（frontmatter paths: 無し）の合計行数
-cd <dotfiles>/claude/rules && grep -L '^paths:' *.md | xargs wc -l | tail -1
 ```
+
+痩身の前後で**同じコマンド**を回して差分を出す。測り方を変えると効果が測れない。退避したスキルは `claude/skills-archive/`（manifest 対象外）へ移す — `claude/skills/` に置いたままでは description が常駐し続けて削減にならない。
 
 ## Step 2 — 判定基準
 
-| シグナル                                                  | 提案                                                                             |
-| --------------------------------------------------------- | -------------------------------------------------------------------------------- |
-| エージェント / スキルが 2 ヶ月連続起動ゼロ                | 削除候補（agent-management.md 棚卸し規約）                                       |
-| description が 150 tokens 超                              | 痩身候補（詳細を本文へ移す）                                                     |
-| 常駐 rule に手順（How）が書かれている                     | skill への移設候補（meta-harness.md 原則 1: rules = 判断基準 / skills = 手順書） |
-| 同じ確認・同じ失敗が複数セッションで反復                  | hook 化 or rule 改訂の候補（原則 4: 規範は宣言、強制は決定論）                   |
-| 組み込み機能（Explore / Plan / code-review 等）と役割重複 | 統合・削除候補                                                                   |
+| シグナル                                                  | 提案                                                                                                                                                        |
+| --------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| エージェント / スキルが 2 ヶ月連続起動ゼロ                | 退避候補（スキルは `skills-archive/` へ。削除ではなく退避が既定 — 2026-08-16 ユーザー判断）。ただし他の rule / skill から正本として参照されているものは残す |
+| description が 150 tokens 超                              | 痩身候補（詳細を本文へ移す）                                                                                                                                |
+| 常駐 rule に手順（How）が書かれている                     | skill への移設候補（meta-harness.md 原則 1: rules = 判断基準 / skills = 手順書）                                                                            |
+| 同じ確認・同じ失敗が複数セッションで反復                  | hook 化 or rule 改訂の候補（原則 4: 規範は宣言、強制は決定論）                                                                                              |
+| 組み込み機能（Explore / Plan / code-review 等）と役割重複 | 統合・削除候補                                                                                                                                              |
 
 ## Step 3 — 出力フォーマット
 
