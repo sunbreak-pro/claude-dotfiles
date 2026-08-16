@@ -1,6 +1,6 @@
 # Plan: 常駐コンテキストの棚卸しと痩身
 
-- **Status**: COMPLETED（2026-08-16 実施・Phase A〜E 完了。D-1 / D-2 の `~/.claude` 清掃のみユーザー確認待ち）
+- **Status**: COMPLETED（2026-08-16 実施・Phase A〜E 完了。D-4 の `graphify-out/` のみユーザー判断で見送り）
 - **Created**: 2026-08-16
 - **Project**: claude-dotfiles
 - **位置づけ**: `docs/plans/2026-08-13-context-efficiency-rollout.md` の **P3（グローバル rules の常駐最小化）の実施計画**。設計原則の正本は `docs/meta-harness.md`（特に原則 2「自由の原資はコンテキストの余白」・原則 4「規範は宣言、強制は決定論」）。
@@ -154,11 +154,13 @@
 - **`claude/agents/role-engineer.md` を 1 行だけ触った**（Scope の「触らない」に反する）。frontmatter の `skills:` に `code-refactoring` が載っており、退避で参照先が消えるため。8/13 計画のポートフォリオ判断には踏み込んでいない。
 - **`skills/playwright-verify/SKILL.md` の `MANDATORY FIRST ACTION` 行を削除**。`rules/skill-launch.md` が「個々の SKILL.md 本文には書かない」と宣言しているのに残っていた転記。C-4 で description を触るついでに解消した。
 
-### D-1 / D-2 の現況（ユーザー確認待ち）
+### D-1 / D-2 の実施結果
 
-- 死んだ symlink は実測 **9 本**（計画の記載は 15 本）。全て `~/dev/claude-dotfiles`（不在）を指す `*.bak`: `agents` `CLAUDE.md` `docs` `hooks` `output-styles` `rules` `skills` `statusline-command.mjs` `templates`
-- `settings.json.bak` は **7 本**（`.bak` 〜 `.bak.6`）。最新 `.bak.6`（8/16 17:45・11,229 B）は今日の install で退避された旧ライブ設定なので、これだけ残すのが妥当
+ユーザー確認のうえ実行済み（2026-08-16）。
 
-### D-4: `graphify-out/` の提案（ユーザー判断待ち）
+- 死んだ symlink **9 本を削除**（計画の記載は 15 本だったが実測 9 本）。全て `~/dev/claude-dotfiles`（不在）を指す `*.bak`: `agents` `CLAUDE.md` `docs` `hooks` `output-styles` `rules` `skills` `statusline-command.mjs` `templates`
+- `settings.json.bak` は **7 本のうち 6 本を削除**し、最新 `.bak.6`（8/16 17:45・11,229 B）だけ残した。これは今日の install で退避された旧ライブ設定で、現行の 8,915 B より大きくまだ拾い戻す価値があるため
 
-`hooks/graphify-nudge.mjs` が `graphify-out/graph.json` のある repo で毎プロンプト約 350 字を注入している。本リポジトリのグラフは 2026-07-28 生成で、graphify スキルの起動実績は通算 1 回。**このリポジトリでは注入コストが実績に見合っていない**ため、`graphify-out/` の削除か nudge の対象外化を提案する。他リポジトリの運用には影響しない。
+### D-4: `graphify-out/`（2026-08-16 ユーザー判断で見送り）
+
+`hooks/graphify-nudge.mjs` が `graphify-out/graph.json` のある repo で毎プロンプト約 350 字を注入している。本リポジトリのグラフは 2026-07-28 生成で、graphify スキルの起動実績は通算 1 回。注入コストが実績に見合っていないが、**別リポジトリの運用にも関わる独立した判断**として本計画では切り出したまま保留する（提案の記載のみ）。
