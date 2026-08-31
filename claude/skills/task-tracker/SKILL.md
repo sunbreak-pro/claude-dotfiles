@@ -333,6 +333,7 @@ per-chat モードの `chat-<self>.md` も legacy モードの `MEMORY.md` / `HI
 6. ローリングアーカイブ:
    - **per-chat モード**: 該当 `history/chat-<self>.md` が 5 件超過なら、最古エントリを `history/archive/YYYY-MM/chat-<self>.md` へ移動 (ディレクトリは必要時 mkdir)
    - **legacy モード**: 従来通り `HISTORY.md` 5 件超過 → `HISTORY-archive.md`
+   - **移動するのは `### YYYY-MM-DD - タイトル` で始まるエントリ本文だけ**。ファイル末尾に索引フッター（「古いエントリは [`archive/YYYY-MM/chat-<self>.md`](./archive/...) を参照」のような相対リンク行）がある場合は**生きているファイルに残す** — 行範囲で機械的に切り出すと末尾フッターまで一緒に運んでしまい、`./archive/...` が archive ディレクトリ基準で解決されてリンク切れになる (2026-08-31 に life-editor で実際に 4 本壊し、docs-lint が落ちた = PR #1344)。切り出す前に「最後のエントリの終わり」がファイル末尾と一致するかを確認する
 7. 他の「進行中」タスクはそのまま維持
 8. **per-chat モードのみ**: INDEX 再生成（§再生成方式の自動判定 — スクリプト方式は `bash .claude/hooks/regen-index.sh`）
 9. **scope-drift 事前検出** (per-chat モード必須 / legacy ではスキップ):
