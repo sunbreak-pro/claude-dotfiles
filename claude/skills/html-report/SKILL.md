@@ -23,7 +23,7 @@ description: 判断材料を HTML で出して Artifact に発行する型。選
 2. 内容は上から **結論カード → 根拠（表・図・スクショ） → 置いた仮定 / 未確認 → 次に判断が要る点** の順。結論カードは「今日から / 必要になったら / 入れない」の 3 分類か、「採用 / 保留 / 見送り」のチップで状態を色で示す。
 3. `Artifact` ツールで発行する（初回は `favicon` 必須。同じファイルの再発行は同じパスで）。発行前に `artifact-design` スキルを読む。
 4. 報告の末尾に **URL とファイルパスの両方** を書く。発行に失敗したらパスだけを書き、`Start-Process <path>` を提示する。
-5. life-editor に控えを残すなら `life-editor-note` スキル（`scripts/le-note.mjs` に URL・パス・要点を渡す。`--pdf` で同名 PDF も作る。PDF の添付は MCP 未対応なのでパスを書くだけ）。
+5. life-editor に控えを残すなら `life-editor-note` スキル（`scripts/le-note.mjs` に URL・要点・パスを渡す。Note には URL と要点だけを置き、本文は転記しない）。
 
 ## 見た目の約束（テンプレートに実装済み・変えない）
 

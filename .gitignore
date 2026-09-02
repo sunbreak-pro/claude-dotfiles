@@ -43,6 +43,3 @@ node_modules/
 
 # graphify 生成物（グラフはローカル限定。commit すると clone 先でも hook が発火し続ける）
 graphify-out/
-
-# html-report の PDF 出力（Edge ヘッドレス印刷の成果物。HTML が正本）
-claude/docs/reports/*.pdf

@@ -48,7 +48,7 @@ claude-dotfiles/
 - `lead-pipeline` … 実装タスクの采配表。重ティアは role-pm → role-engineer（並列）→ session-verifier → role-qa。`ultracode` キーワードで並列最大化（`references/ultracode-mode.md`）
 - `visual-inspect` … 画面・図表・スクリーンショットを `scripts/crop.mjs` で切り抜き → 拡大 → Read、を繰り返して確かめる。依存は sharp だけで初回に自動 install
 - `html-report` … 判断材料を HTML にして Artifact で発行する型。`templates/report.html` が土台、型の見本は Claude Design のキャンバス「Report Templates」
-- `life-editor-note` … レポートの URL・要点・PDF の置き場を life-editor の Note に控えとして残す。`scripts/le-note.mjs` が mcp-server を stdio で直接呼ぶ（MCP 未登録でも可）
+- `life-editor-note` … レポートの URL と要点を life-editor の Note に控えとして残す。`scripts/le-note.mjs` が mcp-server を stdio で直接呼ぶ（MCP 未登録でも可）
 - `task-tracker` … per-chat memory / history の更新と commit。session-verifier が緑になったら確認を待たず実行
 - `execution-router` … `/goal` `/batch` `/loop` の判断とコマンド文字列の提示（Claude は実行しない）
 

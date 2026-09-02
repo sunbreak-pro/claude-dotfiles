@@ -1,21 +1,21 @@
 #!/usr/bin/env node
-// le-note.mjs — life-editor に「レポートの控え」Note を残す。
+// le-note.mjs — life-editor に「レポートの控え」Note を残す（URL・要点・HTML の置き場）。
 // MCP が未登録のセッションでも動くよう、mcp-server を stdio で直接 spawn する。
 //
 //   node le-note.mjs --title "タイトル" --url https://claude.ai/code/artifact/... \
-//        --path docs/reports/2026-09-02-x.html --kind 判断 \
-//        --summary "1 行目" --summary "2 行目" [--tag 開発] [--pdf] [--dry-run]
+//        [--path docs/reports/2026-09-02-x.html] [--kind 判断|進捗|検証|計画] \
+//        [--summary "1 行目" --summary "2 行目"] [--tag 開発] [--dry-run]
 //
 // 必要な環境変数: LIFE_EDITOR_MCP_ENTRY, LIFE_EDITOR_SUPABASE_URL / _ANON_KEY / _EMAIL / _PASSWORD
-// --pdf は --path の HTML を Edge のヘッドレス印刷で同名 .pdf にする（Windows の Edge 前提）。
+// 本文は Markdown で create_note に渡す（見出し・段落・箇条書きだけ）。generate_content の
+// callout / table / codeBlock は画面側の編集器が知らず本文が空に見えたため使わない（2026-09-02 実測）。
 
-import { spawn, spawnSync } from "node:child_process";
-import { existsSync, statSync, mkdtempSync, rmSync, unlinkSync } from "node:fs";
-import { resolve, basename, join } from "node:path";
-import { tmpdir } from "node:os";
+import { spawn } from "node:child_process";
+import { existsSync } from "node:fs";
+import { resolve } from "node:path";
 
 const args = parseArgs(process.argv.slice(2));
-if (args.help || !args.title) {
+if (args.help || !args.title || !args.url) {
   console.log(usage());
   process.exit(args.help ? 0 : 1);
 }
@@ -26,57 +26,39 @@ for (const k of ["LIFE_EDITOR_MCP_ENTRY", "LIFE_EDITOR_SUPABASE_URL", "LIFE_EDIT
 }
 if (!existsSync(entry)) fail(`LIFE_EDITOR_MCP_ENTRY が指す dist/index.js がありません: ${entry}（mcp-server で npm run build）`);
 
-const htmlPath = args.path ? resolve(args.path) : null;
-let pdfPath = null;
-if (args.pdf) {
-  if (!htmlPath || !existsSync(htmlPath)) fail("--pdf には存在する --path（HTML）が必要です");
-  pdfPath = htmlPath.replace(/\.html?$/i, "") + ".pdf";
-  if (!args["dry-run"]) printPdf(htmlPath, pdfPath);
-}
-
 const today = new Date();
 const stamp = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
 const kind = args.kind ?? "レポート";
 const summary = [].concat(args.summary ?? []);
 const tag = args.tag ?? "開発";
+const htmlPath = args.path ? resolve(args.path) : null;
 
-const structure = [
-  { type: "callout", color: "blue", iconName: "FileText", text: `${kind} · ${stamp} · Claude Code が HTML で出した判断材料の控え。本文は URL から開く。` },
-];
-if (args.url) {
-  structure.push({ type: "heading", level: 2, text: "URL" });
-  structure.push({ type: "paragraph", text: args.url });
-}
-if (summary.length) {
-  structure.push({ type: "heading", level: 2, text: "要点" });
-  structure.push({ type: "bulletList", items: summary });
-}
-const places = [];
-if (htmlPath) places.push(`HTML: ${htmlPath}`);
-if (pdfPath) places.push(`PDF:  ${pdfPath}`);
-if (places.length) {
-  structure.push({ type: "heading", level: 2, text: "ファイルの置き場" });
-  structure.push({ type: "codeBlock", language: "text", code: places.join("\n") });
-}
+const lines = ["## URL", "", args.url, ""];
+if (summary.length) lines.push("## 要点", "", ...summary.map((s) => `- ${s}`), "");
+if (htmlPath) lines.push("## ファイル", "", htmlPath, "");
+lines.push(`${kind} · ${stamp} · Claude Code が HTML で出した判断材料の控え。本文は URL から開く。`);
+const content = lines.join("\n");
 
 if (args["dry-run"]) {
-  console.log(JSON.stringify({ title: args.title, tag, structure }, null, 2));
+  console.log(`--- title: ${args.title} / tag: ${tag}\n${content}`);
   process.exit(0);
 }
 
 const client = await startMcp(entry);
 try {
-  // 同名 Note があれば日付を付けて別 Note にする（generate_content は上書きするため）
+  // 同名 Note があれば日付を付けて別 Note にする（控えは上書きせず積む）
   const existing = await client.call("list_notes", { query: args.title, limit: 20 });
   const dup = (existing.notes ?? []).some((n) => n.title === args.title);
   const title = dup ? `${args.title}（${stamp}）` : args.title;
 
-  const created = await client.call("generate_content", { target: "note", title, structure });
+  const created = await client.call("create_note", { title, content });
   const id = created.id;
   if (!id) fail(`Note の作成に失敗: ${JSON.stringify(created).slice(0, 300)}`);
   await client.call("tag_entity", { tag_name: tag, entity_id: id, entity_type: "note" });
   const back = await client.call("get_note", { id });
-  console.log(`created note ${id} "${back.title ?? title}" tag=${tag}${pdfPath ? ` pdf=${pdfPath}` : ""}`);
+  const ok = typeof back.content === "string" && back.content.includes(args.url);
+  console.log(`created note ${id} "${back.title ?? title}" tag=${tag} url-in-body=${ok ? "yes" : "NO"}`);
+  if (!ok) process.exit(2);
 } finally {
   client.close();
 }
@@ -98,44 +80,10 @@ function parseArgs(argv) {
 }
 
 function usage() {
-  return `使い方: node le-note.mjs --title "タイトル" [--url URL] [--path report.html] [--kind 判断|進捗|検証|計画] [--summary "行" ...] [--tag 開発] [--pdf] [--dry-run]`;
+  return `使い方: node le-note.mjs --title "タイトル" --url URL [--path report.html] [--kind 判断|進捗|検証|計画] [--summary "行" ...] [--tag 開発] [--dry-run]`;
 }
 
 function fail(msg) { console.error(`le-note: ${msg}`); process.exit(1); }
-
-function printPdf(html, pdf) {
-  const candidates = [
-    "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
-    "C:\\Program Files\\Microsoft\\Edge\\Application\\msedge.exe",
-    "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
-  ];
-  const exe = candidates.find((p) => existsSync(p));
-  if (!exe) fail("Edge / Chrome が見つからず PDF を作れません（--pdf を外して再実行）");
-  // Edge の msedge.exe は起動直後に exit 0 で戻り、印刷は別プロセスが数秒後に終える（2026-09-02 実測）。
-  // そのため終了コードは見ず、PDF が現れてサイズが落ち着くまで待つ。プロファイルは毎回使い捨て。
-  try { unlinkSync(pdf); } catch {}
-  const profile = mkdtempSync(join(tmpdir(), "le-note-edge-"));
-  const r = spawnSync(exe, [
-    "--headless=new", "--disable-gpu", "--no-first-run",
-    `--user-data-dir=${profile}`,
-    `--print-to-pdf=${pdf}`, "--print-to-pdf-no-header",
-    "--virtual-time-budget=5000",
-    `file:///${html.split("\\").join("/")}`,
-  ], { stdio: "ignore", timeout: 60000 });
-  if (r.error) fail(`Edge の起動に失敗しました: ${r.error.message}`);
-  const deadline = Date.now() + 45000;
-  let last = -1;
-  while (Date.now() < deadline) {
-    Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 500);
-    if (!existsSync(pdf)) continue;
-    const size = statSync(pdf).size;
-    if (size > 0 && size === last) break;
-    last = size;
-  }
-  if (!existsSync(pdf) || statSync(pdf).size === 0) fail("PDF が 45 秒待っても現れませんでした");
-  try { rmSync(profile, { recursive: true, force: true, maxRetries: 3, retryDelay: 1000 }); } catch {}
-  console.log(`pdf ${basename(pdf)} ${statSync(pdf).size} bytes`);
-}
 
 function startMcp(entryPath) {
   return new Promise((resolveClient, reject) => {
