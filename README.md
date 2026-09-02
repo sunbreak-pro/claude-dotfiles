@@ -124,6 +124,7 @@ symlink でインストールされた項目は `~/.claude/` 越しの編集が�
   `.bak` に退避され、**以後の SSOT はこの repo になる**（lib 側は更新されない。残存参照は `claude/docs/skill-lib-retirement.md`）。
 - `skills-archive/code-refactoring/scripts/init_lang_refactoring.sh` はスキル内部の
   補助スクリプトで Windows ネイティブでは動かない（退避済みなので現状は未配布）。
+- `permissions.allow` に `Agent` を入れてある（2026-09-02）。サブエージェントの起動は auto mode の分類器を通らず許可される（起動した子の Bash / Edit は従来どおり判定と hook を通る）。指示文に git 用語が並ぶだけで起動が止まっていたため。
 - `settings.json` の `model` / `effortLevel` / `modelSettings` もそのまま共有される。マシンごとに
   変えたい場合は `settings.local.json`（非共有）で上書きする。`/effort` で保存した値は `modelSettings` に入るので、
   repo 側と食い違ったら `node install.mjs` で repo 側に揃う。

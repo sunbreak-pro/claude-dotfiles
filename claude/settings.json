@@ -1,6 +1,6 @@
 {
   "permissions": {
-    "allow": ["Edit", "Write", "WebSearch", "mcp__pencil"],
+    "allow": ["Edit", "Write", "WebSearch", "Agent", "mcp__pencil"],
     "deny": [
       "Bash(rm -rf *)",
       "Bash(git push --force *)",
