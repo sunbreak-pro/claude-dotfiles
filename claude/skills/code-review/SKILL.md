@@ -5,63 +5,22 @@ description: Structured code review checklist and output format. Use when review
 
 # Code Review
 
-## Review Process
+Read the full diff, understand the purpose (commit message / PR description), then report findings in the format below.
 
-1. Read the full diff or changed files first
-2. Understand the purpose of the change (commit message, PR description, or ask)
-3. Apply the checklist below
-4. Output findings in the standard format
+## Scope
 
-## Checklist
+- **Correctness**: logic errors, edge cases, wrong assumptions about data shape, missing error handling at system boundaries
+- **Security** (quick pass only): injection, exposed secrets, unvalidated input reaching a sink, missing auth checks. When the diff touches auth / authz, secrets, DB or IPC boundaries, hand the deep audit to the `security-reviewer` agent instead of going further here.
+- **Performance**: N+1, unnecessary re-renders, missing memoization on expensive work, unbounded fetching
+- **Maintainability**: unclear naming, dead code, functions doing too much, duplicated logic, `any` / type assertions hiding real type issues
 
-### Correctness
+## Output
 
-- Logic errors, off-by-one, null/undefined handling
-- Edge cases not covered
-- Incorrect assumptions about data shape or types
-- Missing error handling at system boundaries (user input, external APIs)
+Categorize each finding:
 
-### Security
-
-This is a **quick pass**. When the diff warrants a real audit (auth / authz, secrets, DB or IPC boundaries, user-supplied input reaching a sink), hand it to the `security-reviewer` agent instead of going deeper here.
-
-- SQL injection, XSS, command injection (OWASP top 10)
-- Exposed secrets, credentials, or API keys
-- Insecure data handling (logging PII, unvalidated redirects)
-- Missing authentication/authorization checks
-
-### Performance
-
-- N+1 queries, unnecessary re-renders
-- Missing memoization for expensive computations
-- Large bundle imports when smaller alternatives exist
-- Unbounded data fetching without pagination
-
-### Maintainability
-
-- Unclear naming, magic numbers, dead code
-- Missing types or overly broad types (`any`)
-- Functions doing too many things (SRP violation)
-- Duplicated logic that should be extracted
-
-### TypeScript Specific
-
-- `any` usage where specific types are possible
-- Missing `null`/`undefined` checks with strict mode
-- Incorrect generic constraints
-- Type assertions (`as`) hiding real type issues
-
-## Output Format
-
-Categorize each finding as:
-
-**Blocking** - Must fix before merge. Bugs, security issues, data loss risks.
-
-**Important** - Should fix. Performance issues, maintainability concerns, missing edge cases.
-
-**Suggestion** - Nice to have. Style improvements, alternative approaches, minor optimizations.
-
-Format each finding as:
+- **Blocking** — must fix before merge (bugs, security, data loss)
+- **Important** — should fix (performance, maintainability, missing edge cases)
+- **Suggestion** — nice to have
 
 ```
 ### [Blocking|Important|Suggestion] <brief title>
@@ -71,10 +30,4 @@ Format each finding as:
 **Fix**: Suggested resolution
 ```
 
-## Summary
-
-End with a brief summary:
-
-- Total findings count by category
-- Overall assessment (approve, request changes, or needs discussion)
-- Key risks if any blocking issues exist
+End with the count per category, the overall assessment (approve / request changes / needs discussion), and key risks if any Blocking finding exists.

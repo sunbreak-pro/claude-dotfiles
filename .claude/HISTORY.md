@@ -1,5 +1,25 @@
 # HISTORY.md - 変更履歴
 
+### 2026-09-02 - Fable 5.1 向けハーネス全面改訂（3 前提 / 痩身 / effort 方針 / visual-inspect / 非同期采配）
+
+#### 概要
+
+メインモデルが Claude Fable 5.1 になったのに合わせ、旧世代向けの冗長な指示（細かい手順・自己検証の強制・設計思想の解説・ASCII 図・同じ注意の再掲）を rules / agents / skills / output style から一括で削り、`CLAUDE.md` に「ユーザーは見ていない / 範囲を限定する / 並列で進める」の 3 前提を置いた。その前提の上に、切り抜き 1 本で画像を自分で確かめる `visual-inspect` スキル、サブエージェントの完了を待たない采配、`xhigh` / `max` を実測記録のある種別に限る effort 方針を載せた。根拠は公式の Fable 5.1 指針（outcomes を書き steps を書かない / verification reminder を省く / high 既定・xhigh は 30 分超の長時間 agentic 作業向け / サブエージェントの開始ツールは即 return して lead は待たない）。
+
+#### 変更点
+
+- **CLAUDE.md**: 「前提（全作業共通）」節を新設して 3 前提を明文化。Working Rules を 5 行に圧縮し、effort 既定 high と effort-ledger、visual-inspect、lead-pipeline / execution-router へのポインタを追加。2,507 → 2,164 B
+- **settings.json**: `model` を Fable に、`effortLevel` を high に固定し `modelSettings.claude-fable-5-1.effortLevel = high` を追加（`/effort` の保存先と揃える）。`feedbackDrafts: off` と `PostCompact` hook を実効設定から取り込み
+- **rules**: `heavy-workflows` / `memory-boundary` / `skill-launch` を削除（CLAUDE.md・execution-router・task-tracker・hook コメントへ吸収）。`agent-management` + `skill-management` を `harness-management.md`（paths 付き・2.7KB）に統合し、skill-lib 残存参照表は `docs/skill-lib-retirement.md` へ移送。`tone.md` はサブエージェント向け要点 6 行に、`plan-mode-quality.md` は 3 行に
+- **output-styles/tone-persona.md**: 自己確認リストと重複箇条書きを削り 4.6 → 3.1KB。作業報告に「置いた仮定」を書く旨を追加
+- **agents（7 本・54 → 34KB）**: `effort:` を全削除（role-qa / security-reviewer / playwright-ui-verifier の xhigh を含む）。ask-user 差し戻しを「仮定を置いて進め、出力に書く」に置換。role-pm の出力に並列 unit 分割表を必須化。role-engineer に unit 外不可侵を明記。security-reviewer のチェックリストをカテゴリ列挙に圧縮
+- **skills**: lead-pipeline を「待たない・メインも 1 unit を担当」前提で書き直し（9.2 → 5.0KB、ultracode-mode 4.5 → 2.0KB）。task-tracker 35 → 13KB（曖昧時は PAUSE 既定、scope-drift は self-owned だけ stage して報告。PR #21 のフッター規則は保持）。git-workflow 17 → 8KB（commit はメッセージ提示なし、feature branch からの PR 作成は確認なし）。git-branch-flow 14 → 4.8KB、git-conflict-resolver 8.5 → 3.4KB、ask-user 8.7 → 2.7KB（不可逆操作と「仮定では成果物が無意味」の 2 条件だけ）、session-verifier 8.5 → 4.2KB、code-plan-editor 7.5 → 2.8KB、harness-reflect 6.6 → 4.2KB、playwright-verify 5.4 → 3.6KB、efficient-codebase-nav 4.1 → 1.6KB、execution-router 8.8 → 4.0KB
+- **skills/visual-inspect（新設）**: `scripts/crop.mjs`（`--grid` で座標格子つき全体図 / `--cell` `--region` で切り抜き拡大 / sharp を初回に自動 install）と手順書。切り抜き → 拡大 → Read → 確かめる、を全点確認まで繰り返す
+- **docs**: `effort-ledger.md` 新設（xhigh / max 採用種別の台帳・現時点ゼロ）。`hooks_guide.md` 削除（一般知識）。`meta-harness.md` の参照先を更新
+- **hooks/pipeline-gate.mjs**: 注入文を新チェーンに合わせて短縮
+- **README**: 前提節・rules 表・skills 抜粋・hooks 表を実態に更新
+- **見送り**: 編集用サブエージェント 3 体のうち 2 体（task-tracker / git 系）が auto mode の分類器で起動拒否されたため、その分はメインが直接編集した。graphify-out/ の扱いは従来どおり保留
+
 ### 2026-07-28 - Loop Engineering ハーネス設計（判断の非同期化ロードマップ）
 
 #### 概要
