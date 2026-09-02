@@ -2,32 +2,25 @@
 
 ## Language
 
-- Respond in Japanese by default
-- Code, commit messages, branch names, and PR titles are in English
+- 日本語で応答する。コード・コミットメッセージ・ブランチ名・PR タイトルは英語。
+- 口調の正本は output style `tone-persona`（サブエージェント向け要点は `rules/tone.md`）。
 
-## 口調・人格（全プロジェクト共通・最優先）
+## 前提（全作業共通）
 
-> **正本 = output style `output-styles/tone-persona.md`**（settings.json で常時有効化済み・システムプロンプト直書きで最も強く効く）。**詳細補遺 = `rules/tone.md`**（サブエージェント向け要点 / 比喩の詳細例 / 良い例・悪い例 / ユーザー本人の口調）。口調ルールを更新するときは tone-persona だけを直す。
+1. **ユーザーは見ていない。** 途中で質問して止まらない。判断は自分で下して進め、置いた仮定は最後の報告に書く。聞いてよいのは不可逆操作の直前と、どの仮定を置いても成果物が無意味になる場合だけ。報告は最後の 1 メッセージで完結させる。
+2. **範囲を限定する。** 着手時に「触るファイル / 完了条件 / 触らないもの」を決めて宣言し、外に手を出さない。気づいたことは直さず報告に回す。
+3. **並列で進める。** 独立したツール呼び出しとサブエージェント起動は 1 メッセージにまとめる。サブエージェントの完了は待たず、リーダー自身も担当分を進めて通知が来たら統合する。
 
 ## Working Rules
 
-- セッション開始時はプロジェクトの `.claude/CLAUDE.md` と `.claude/skills/` を先に確認し、既存コードを読んでから変更する
-- ネイティブツール（Glob / Grep / Read / Edit）を bash（find / grep / cat / sed）より優先し、独立した操作は並列で呼ぶ
-- 新しい要件を受けたら実装前に「意図 / スコープ / 曖昧な仮定」を確認する。確認の形式は `ask-user` スキル、重ティアの要件分解は `role-pm` エージェント（起動判断は `lead-pipeline`）
-- ツール実行直後にハングしたら ESC で復帰する。原因は Claude Code 本体の SSE バグで、hook / MCP / ローカル環境を疑う調査は無駄（対処フロー: `docs/bash-tool-stability.md`）
+- 起動時にプロジェクトの `.claude/CLAUDE.md` と `.claude/skills/` を確認し、既存コードを読んでから変更する。
+- Effort は `high` が既定。`xhigh` / `max` は `docs/effort-ledger.md` に効果の実測があるタスク種別だけに使い、該当時は `/effort xhigh` の貼り付けを提案する。
+- 画面・図表・スクリーンショットの確認は `visual-inspect` スキル。切り抜いて拡大して見る、を自分で繰り返して確かめる。
+- 実装タスクの采配は `lead-pipeline`。`/loop` `/goal` `/batch` は Claude が実行せず、コマンド文字列を提示する（`execution-router`）。
+- ツール実行直後にハングしたら ESC で復帰する。原因は Claude Code 本体側で、ローカル調査は無駄（`docs/bash-tool-stability.md`）。
 
 ## Code Conventions
 
 - TypeScript: strict mode, explicit return types for public APIs
 - React: functional components with hooks, avoid class components
 - Prefer named exports over default exports
-
-## Heavy Work Modes
-
-- 反復・ポーリングは `/loop`、条件達成型は `/goal`、大規模機械的変更は `/batch`。モード選定と貼り付け用コマンド提示は execution-router スキルに委譲する
-- 重量級タスクはプロンプトに `ultracode` キーワードを含めるとマルチエージェント並列采配（lead-pipeline の ultracode モード, references/ultracode-mode.md）が発動する。該当しそうなタスクでは Claude から付与を提案する
-- 運用詳細: `rules/heavy-workflows.md`
-
-## Project Documentation Structure
-
-新規・既存プロジェクトで `.claude/` を立ち上げる / 整えるときの標準構造・運用原則・CLAUDE.md の標準章構成は **`project-setter` スキルが正本**。プロジェクトを作る時にだけ要るので、常時ロードから外した（2026-08-06）。

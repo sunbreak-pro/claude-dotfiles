@@ -32,7 +32,7 @@
 
 - 本当に守らせたいことは hook（決定論・fail-open）で担保し、rule の文面は最小限に保つ。
 - 逆に、hook で守れていることを rule に長文で重ねて書かない（文面が増えるほど常駐が太り、原則 2 に反する）。
-- 例: skill 起動通知は `skill-launch.md`（宣言）+ `skill-launch-notice.mjs`(強制) の 2 点セットで、各 SKILL.md への転記を廃止済み。この型を標準とする。
+- 例: skill 起動通知は `hooks/skill-launch-notice.mjs`（強制）だけで担保し、rule 側の宣言は廃止済み（2026-09-02）。各 SKILL.md にも転記しない。この型を標準とする。
 
 ### 5. エスカレーションは処方箋より梯子
 
@@ -50,7 +50,7 @@
 
 - rule / skill の全面リライト運動はしない。改訂は摩擦シグナルが指した箇所だけ、diff 単位で行う。
 - Claude による settings.json / hooks の自動変更はしない（提案まで）。
-- 記憶系の新設はしない（task-tracker / auto memory / sui-memory の境界は `rules/memory-boundary.md` が正本）。
+- 記憶系の新設はしない（タスク状態の正本は task-tracker。sui-memory はセッション横断の自動要約のみで、境界は `skills/task-tracker/SKILL.md` §規約に記す）。
 
 ## 語彙
 

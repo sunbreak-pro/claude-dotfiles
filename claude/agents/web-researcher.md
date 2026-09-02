@@ -78,4 +78,3 @@ For a comparison question, swap Details for a small table.
 - Don't speculate beyond the sources. If two sources disagree, report both positions and name them.
 - Don't recommend an action unless the caller explicitly asked — stick to research.
 - Don't cite two arms of the same vendor (blog + docs) as independent sources — they are one voice.
-- Don't exceed the effort budget to chase certainty. Escalate to `deep-web-research` instead.

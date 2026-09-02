@@ -9,7 +9,13 @@
     ],
     "defaultMode": "auto"
   },
-  "model": "Opus",
+  "model": "Fable",
+  "effortLevel": "high",
+  "modelSettings": {
+    "claude-fable-5-1": {
+      "effortLevel": "high"
+    }
+  },
   "autoMode": {
     "environment": [
       "$defaults",
@@ -221,6 +227,17 @@
           }
         ]
       }
+    ],
+    "PostCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ -f 'C:/Users/user/.orca/agent-hooks/claude-hook.cmd' ]; then 'C:/Users/user/.orca/agent-hooks/claude-hook.cmd'; else { command -p cat 2>/dev/null || cat; } >/dev/null 2>&1 || :; fi",
+            "timeout": 10
+          }
+        ]
+      }
     ]
   },
   "statusLine": {
@@ -230,7 +247,7 @@
   "enabledPlugins": {},
   "outputStyle": "tone-persona",
   "alwaysThinkingEnabled": true,
-  "effortLevel": "high",
+  "feedbackDrafts": "off",
   "skipDangerousModePermissionPrompt": true,
   "skipWorkflowUsageWarning": true,
   "remoteControlAtStartup": true,

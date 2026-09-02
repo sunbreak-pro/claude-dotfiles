@@ -1,0 +1,9 @@
+{
+  "name": "visual-inspect-scripts",
+  "private": true,
+  "type": "module",
+  "description": "crop.mjs runtime deps (sharp). Installed on first use by crop.mjs itself.",
+  "dependencies": {
+    "sharp": "^0.34.0"
+  }
+}

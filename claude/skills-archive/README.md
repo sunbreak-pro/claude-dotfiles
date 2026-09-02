@@ -6,7 +6,7 @@
 
 ## 退避基準
 
-`rules/skill-management.md` の削除前の確認義務に従い、**ユーザー確認を取ってから**移す。判断材料は `harness-reflect` スキルで測る起動実績。
+`rules/harness-management.md` の削除前の確認義務に従い、**ユーザー確認を取ってから**移す。判断材料は `harness-reflect` スキルで測る起動実績。
 
 ## 退避済み（2026-08-16・直近 2 か月の起動実績ゼロ）
 
