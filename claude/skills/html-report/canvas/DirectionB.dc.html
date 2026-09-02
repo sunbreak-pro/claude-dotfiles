@@ -1,0 +1,65 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=BIZ+UDPGothic:wght@400;700&display=swap">
+  <style>
+    body { margin: 0; background: #fbfbf9; color: #222; font-family: "IBM Plex Mono", "Consolas", "BIZ UDPGothic", "Yu Gothic UI", monospace; font-size: 13px; line-height: 1.55; }
+    a { color: #222; } a:hover { color: #000; }
+    h1, h2, p { margin: 0; }
+    h1 { font-size: 20px; font-weight: 600; }
+    h2 { font-size: 12px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; border-bottom: 2px solid #222; padding-bottom: 4px; }
+    table { border-collapse: collapse; width: 100%; }
+    td, th { border-bottom: 1px solid #ccc; padding: 6px 8px; text-align: left; vertical-align: top; }
+    th { font-weight: 600; font-size: 11px; }
+    .k { display: inline-block; min-width: 46px; font-weight: 600; }
+    .tag { border: 1px solid #222; padding: 0 6px; font-size: 11px; }
+    .tag.now { background: #222; color: #fbfbf9; }
+  </style>
+</helmet>
+<div style="width: 960px; background: #fbfbf9; padding: 36px 40px 48px; box-sizing: border-box; display: flex; flex-direction: column; gap: 22px;">
+
+  <div style="display: flex; justify-content: space-between; align-items: baseline; border-bottom: 2px solid #222; padding-bottom: 10px;">
+    <h1>対案 B · 台帳型（ラフ）</h1>
+    <span>2026-09-02 · 1 色・等幅・罫線だけ</span>
+  </div>
+
+  <p>ねらい: ターミナルの延長として読める密度優先の型。装飾を捨てて、表と罫線だけで判断材料を並べる。<br>長所: 情報量が多い進捗や比較に強い。短所: 結論が視覚的に浮かばず、読み手が上から順に読む必要がある。</p>
+
+  <div style="display: flex; flex-direction: column; gap: 8px;">
+    <h2>結論</h2>
+    <div style="display: flex; flex-direction: column; gap: 4px;">
+      <div><span class="tag now">NOW</span> stdio 直叩き（node spawn） — 実証済み・導入なし</div>
+      <div><span class="tag">LATER</span> ~/.claude.json 登録 — 常駐費を計測してから</div>
+      <div><span class="tag">SKIP</span> .mcp.json 変更 — 他マシンに波及</div>
+    </div>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 8px;">
+    <h2>比較</h2>
+    <table>
+      <thead><tr><th>案</th><th>導入</th><th>常駐</th><th>壊しやすさ</th><th>判定</th></tr></thead>
+      <tbody>
+        <tr><td>stdio 直叩き</td><td>不要</td><td>0</td><td>低</td><td>採用</td></tr>
+        <tr><td>~/.claude.json</td><td>1 コマンド</td><td>35 tools</td><td>低</td><td>保留</td></tr>
+        <tr><td>.mcp.json</td><td>1 行</td><td>35 tools</td><td>高</td><td>見送り</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 8px;">
+    <h2>仮定 / 未確認 / 次の判断</h2>
+    <div><span class="k">仮定</span> 環境変数は維持される · Note に生 HTML は貼らない</div>
+    <div><span class="k">未確認</span> 登録時の常駐トークン量 · Orca 再起動の要否</div>
+    <div><span class="k">判断</span> スキル化するか · Note に流す粒度</div>
+  </div>
+
+</div>
+</x-dc>
+</body>
+</html>
