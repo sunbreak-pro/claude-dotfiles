@@ -1,0 +1,100 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <style>
+    body { margin: 0; background: #f5f7f6; color: #1c2327; font-family: "BIZ UDPGothic", "Yu Gothic UI", "Meiryo", sans-serif; font-size: 15px; line-height: 1.7; -webkit-font-smoothing: antialiased; }
+    a { color: #0e6b74; } a:hover { color: #0a4f56; }
+    code, pre, .mono { font-family: "IBM Plex Mono", "Consolas", monospace; }
+    h1, h2, h3 { margin: 0; text-wrap: balance; font-weight: 700; }
+    h1 { font-size: 30px; line-height: 1.3; }
+    h2 { font-size: 19px; }
+    h3 { font-size: 16px; }
+    p { margin: 0; }
+    .eyebrow { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: #56636b; font-weight: 700; }
+    .muted { color: #56636b; }
+    .small { font-size: 13px; }
+    table { border-collapse: collapse; width: 100%; font-size: 14px; }
+    th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid #d5dcdf; vertical-align: top; }
+    th { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: #56636b; background: #f5f7f6; white-space: nowrap; }
+    tr:last-child td { border-bottom: 0; }
+    .panel { background: #ffffff; border: 1px solid #d5dcdf; border-radius: 6px; }
+    .chip { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; letter-spacing: .06em; padding: 2px 8px; border-radius: 3px; white-space: nowrap; }
+    .chip.ok { background: #dff1e6; color: #1f5c38; }
+    .chip.warn { background: #fbecd2; color: #7a4b0a; }
+    .chip.stop { background: #f8dede; color: #7d2a2a; }
+    .chip.idle { background: #e6ebee; color: #56636b; }
+    .num { font-variant-numeric: tabular-nums; }
+    pre { margin: 0; background: #eaf0f0; border: 1px solid #d5dcdf; border-radius: 6px; padding: 12px 14px; font-size: 13px; line-height: 1.6; overflow-x: auto; }
+    p code, td code, li code { background: #eaf0f0; padding: 1px 5px; border-radius: 3px; font-size: .92em; }
+
+    .shot { background: #ffffff; border: 1px solid #d5dcdf; border-radius: 6px; overflow: hidden; display: flex; flex-direction: column; }
+    .shot .cap { padding: 8px 12px; font-size: 12px; color: #56636b; border-top: 1px solid #d5dcdf; display: flex; justify-content: space-between; }
+    .ph { height: 260px; background: repeating-linear-gradient(135deg, #eef2f2 0 12px, #e4eaea 12px 24px); display: flex; align-items: center; justify-content: center; color: #56636b; font-size: 13px; }
+    .finding { display: grid; grid-template-columns: 6px 1fr; gap: 12px; background: #ffffff; border: 1px solid #d5dcdf; border-radius: 6px; overflow: hidden; }
+    .finding .stripe { background: #a23c3c; } .finding.warn .stripe { background: #a86a12; } .finding.ok .stripe { background: #2c7a4b; }
+    .finding .body { padding: 10px 14px 10px 6px; display: flex; flex-direction: column; gap: 2px; }
+  </style>
+</helmet>
+<div style="width: 960px; background: #f5f7f6; padding: 40px 40px 56px; box-sizing: border-box; display: flex; flex-direction: column; gap: 26px;">
+
+  <div style="display: flex; flex-direction: column; gap: 6px; border-bottom: 1px solid #d5dcdf; padding-bottom: 18px;">
+    <p class="eyebrow">画面検証 · #1408 Briefing · playwright + visual-inspect</p>
+    <h1>ダークテーマで見出しの余白が詰まる</h1>
+    <p class="muted">Claude が切り抜いて拡大して読んだ結果を、before / after と所見の並びで出す。目視の依頼はしない。</p>
+  </div>
+
+  <div class="panel" style="padding: 14px 18px; display: flex; flex-direction: column; gap: 4px;">
+    <h2>判定</h2>
+    <p>Blocking 1 件。修正して再検証するまで PR は出さない。再検証は同じ crop 領域で before / after を並べる。</p>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px;">
+    <div class="shot">
+      <div class="ph">スクリーンショット（ライト・1440×900）</div>
+      <div class="cap"><span>pwv1408-briefing-light.png</span><span class="mono">crop --region 0,0,720,240 ×3</span></div>
+    </div>
+    <div class="shot">
+      <div class="ph">スクリーンショット（ダーク・1440×900）</div>
+      <div class="cap"><span>pwv1408-briefing-dark.png</span><span class="mono">crop --region 0,0,720,240 ×3</span></div>
+    </div>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 10px;">
+    <h2>所見</h2>
+    <div style="display: flex; flex-direction: column; gap: 8px;">
+      <div class="finding">
+        <div class="stripe"></div>
+        <div class="body">
+          <div style="display: flex; gap: 10px; align-items: center;"><span class="chip stop">Blocking</span><h3>見出し下の余白が 8px（ライトは 16px）</h3></div>
+          <p class="small muted">拡大 3 倍で計測。<code>lumen-space-4</code> がダーク側で上書きされている。BriefingHeader.tsx:42</p>
+        </div>
+      </div>
+      <div class="finding warn">
+        <div class="stripe"></div>
+        <div class="body">
+          <div style="display: flex; gap: 10px; align-items: center;"><span class="chip warn">要確認</span><h3>日付の数字が等幅でない</h3></div>
+          <p class="small muted">桁が揺れると縦に並んだとき読みにくい。<code>tabular-nums</code> の指定漏れか。</p>
+        </div>
+      </div>
+      <div class="finding ok">
+        <div class="stripe"></div>
+        <div class="body">
+          <div style="display: flex; gap: 10px; align-items: center;"><span class="chip ok">問題なし</span><h3>コントラスト比は両テーマとも 4.5:1 以上</h3></div>
+          <p class="small muted">本文 / 補助テキスト / リンクの 3 種を実測。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+</div>
+</x-dc>
+</body>
+</html>

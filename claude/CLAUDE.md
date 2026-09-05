@@ -16,6 +16,7 @@
 - 起動時にプロジェクトの `.claude/CLAUDE.md` と `.claude/skills/` を確認し、既存コードを読んでから変更する。
 - Effort は `high` が既定。`xhigh` / `max` は `docs/effort-ledger.md` に効果の実測があるタスク種別だけに使い、該当時は `/effort xhigh` の貼り付けを提案する。
 - 画面・図表・スクリーンショットの確認は `visual-inspect` スキル。切り抜いて拡大して見る、を自分で繰り返して確かめる。
+- 判断材料が 3 つ以上並ぶ報告・比較・検証・進捗は `html-report` スキルで HTML にし、Artifact で発行する。確認先は claude.ai/code/artifacts が既定。
 - 実装タスクの采配は `lead-pipeline`。`/loop` `/goal` `/batch` は Claude が実行せず、コマンド文字列を提示する（`execution-router`）。
 - ツール実行直後にハングしたら ESC で復帰する。原因は Claude Code 本体側で、ローカル調査は無駄（`docs/bash-tool-stability.md`）。
 

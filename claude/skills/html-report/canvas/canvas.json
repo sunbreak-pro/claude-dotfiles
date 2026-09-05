@@ -1,0 +1,77 @@
+{
+  "artboards": [
+    {
+      "file": "Main.dc.html",
+      "title": "判断レポート",
+      "x": 0,
+      "y": 0,
+      "w": 960,
+      "h": 1180,
+      "print": "flow"
+    },
+    {
+      "file": "Progress.dc.html",
+      "title": "進捗",
+      "x": 1060,
+      "y": 0,
+      "w": 960,
+      "h": 980,
+      "print": "flow"
+    },
+    {
+      "file": "Verify.dc.html",
+      "title": "画面検証",
+      "x": 2120,
+      "y": 0,
+      "w": 960,
+      "h": 1120,
+      "print": "flow"
+    },
+    {
+      "file": "Plan.dc.html",
+      "title": "計画書",
+      "x": 0,
+      "y": 1340,
+      "w": 960,
+      "h": 1120,
+      "print": "flow"
+    },
+    {
+      "file": "Tokens.dc.html",
+      "title": "トークンと部品",
+      "x": 1060,
+      "y": 1340,
+      "w": 960,
+      "h": 1280,
+      "print": "flow"
+    },
+    {
+      "file": "DirectionB.dc.html",
+      "title": "対案 B · 台帳型（ラフ）",
+      "x": 2120,
+      "y": 1340,
+      "w": 960,
+      "h": 760,
+      "print": "flow"
+    }
+  ],
+  "annotations": [
+    {
+      "id": "rules",
+      "x": 0,
+      "y": -200,
+      "w": 520,
+      "text": "html-report の約束\n・いつ: 選択肢 3 つ以上 / 比較表 / スクショ / 進捗の俯瞰。1 問 1 答は文章のまま\n・どこ: docs/reports/YYYY-MM-DD-slug.html\n・どう見る: Artifact 発行が既定。claude.ai/code/artifacts で確認\n・型: 結論カードを最上段 → 根拠 → 仮定 / 未確認 → 次の判断"
+    },
+    {
+      "id": "direction",
+      "x": 2120,
+      "y": 1240,
+      "w": 420,
+      "text": "採用は上段の型（UD ゴシック + 青緑）。対案 B は密度優先の別方向。選び直すならここから。"
+    }
+  ],
+  "launch": {
+    "view": "canvas"
+  }
+}

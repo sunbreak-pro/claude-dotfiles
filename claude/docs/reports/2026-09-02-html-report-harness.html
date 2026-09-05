@@ -1,0 +1,216 @@
+<title>HTML Report Harness</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    --ground: #f5f7f6;
+    --panel: #ffffff;
+    --ink: #1c2327;
+    --ink-2: #56636b;
+    --line: #d5dcdf;
+    --accent: #0e6b74;
+    --accent-ink: #ffffff;
+    --accent-soft: #dcefef;
+    --ok: #2c7a4b;
+    --warn: #a86a12;
+    --stop: #a23c3c;
+    --code-bg: #eaf0f0;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #13181b;
+      --panel: #1b2226;
+      --ink: #e4e9eb;
+      --ink-2: #99a6ad;
+      --line: #2c363b;
+      --accent: #5fc4cc;
+      --accent-ink: #0f1c1e;
+      --accent-soft: #163338;
+      --ok: #6fc48f;
+      --warn: #e0a94a;
+      --stop: #e07a7a;
+      --code-bg: #0f1417;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #13181b;
+    --panel: #1b2226;
+    --ink: #e4e9eb;
+    --ink-2: #99a6ad;
+    --line: #2c363b;
+    --accent: #5fc4cc;
+    --accent-ink: #0f1c1e;
+    --accent-soft: #163338;
+    --ok: #6fc48f;
+    --warn: #e0a94a;
+    --stop: #e07a7a;
+    --code-bg: #0f1417;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: "BIZ UDPGothic", "Hiragino Sans", "Yu Gothic UI", "Meiryo", sans-serif;
+    font-size: 16px;
+    line-height: 1.75;
+    -webkit-font-smoothing: antialiased;
+  }
+  code, pre, .mono { font-family: "IBM Plex Mono", "Consolas", "Courier New", monospace; }
+  .wrap { max-width: 960px; margin: 0 auto; padding: 48px 24px 80px; }
+  .prose { max-width: 720px; }
+  header { border-bottom: 1px solid var(--line); padding-bottom: 28px; margin-bottom: 36px; }
+  .eyebrow { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-2); font-weight: 700; margin: 0 0 8px; }
+  h1 { font-size: clamp(28px, 4vw, 38px); line-height: 1.25; margin: 0 0 12px; text-wrap: balance; font-weight: 700; }
+  .lede { font-size: 18px; color: var(--ink-2); margin: 0; max-width: 720px; }
+  h2 { font-size: 22px; margin: 48px 0 12px; text-wrap: balance; padding-top: 8px; }
+  h3 { font-size: 17px; margin: 24px 0 8px; }
+  p { margin: 0 0 14px; }
+  ul { padding-left: 1.3em; margin: 0 0 14px; }
+  li { margin-bottom: 4px; }
+  a { color: var(--accent); }
+
+  .verdicts { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin: 0; padding: 0; list-style: none; }
+  .verdict { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 18px 20px 16px; display: flex; flex-direction: column; gap: 8px; }
+  .verdict .tag { font-size: 12px; letter-spacing: .1em; text-transform: uppercase; font-weight: 700; display: inline-flex; align-items: center; gap: 8px; }
+  .verdict .tag::before { content: ""; width: 10px; height: 10px; border-radius: 50%; background: currentColor; }
+  .verdict.now .tag { color: var(--ok); }
+  .verdict.later .tag { color: var(--warn); }
+  .verdict.skip .tag { color: var(--stop); }
+  .verdict h3 { margin: 0; font-size: 18px; }
+  .verdict p { margin: 0; color: var(--ink-2); font-size: 15px; }
+
+  .flow { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; background: var(--panel); margin: 16px 0 20px; }
+  .step { padding: 18px 20px; border-right: 1px solid var(--line); }
+  .step:last-child { border-right: 0; }
+  .step .n { font-family: "IBM Plex Mono", monospace; font-size: 12px; color: var(--accent); font-weight: 500; letter-spacing: .08em; }
+  .step h3 { margin: 4px 0 6px; font-size: 17px; }
+  .step p { margin: 0 0 8px; font-size: 14px; color: var(--ink-2); }
+  .step code { font-size: 13px; background: var(--code-bg); padding: 2px 6px; border-radius: 4px; }
+  @media (max-width: 720px) { .flow { grid-template-columns: 1fr; } .step { border-right: 0; border-bottom: 1px solid var(--line); } .step:last-child { border-bottom: 0; } }
+
+  pre { background: var(--code-bg); border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; overflow-x: auto; font-size: 13.5px; line-height: 1.6; margin: 0 0 16px; }
+  pre code { background: none; padding: 0; }
+  p code, li code, td code { background: var(--code-bg); padding: 1px 5px; border-radius: 4px; font-size: .9em; }
+
+  .tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); margin: 12px 0 20px; }
+  table { border-collapse: collapse; width: 100%; font-size: 14.5px; }
+  th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); background: var(--ground); font-weight: 700; white-space: nowrap; }
+  tr:last-child td { border-bottom: 0; }
+  td.state { white-space: nowrap; font-weight: 700; }
+  td.state.yes { color: var(--ok); }
+  td.state.no { color: var(--ink-2); font-weight: 400; }
+  td.state.maybe { color: var(--warn); }
+
+  .callout { border-left: 3px solid var(--accent); background: var(--accent-soft); padding: 12px 16px; border-radius: 0 6px 6px 0; margin: 16px 0 20px; font-size: 15px; }
+  .callout strong { color: var(--accent); }
+  .note { font-size: 14px; color: var(--ink-2); }
+  dl { display: grid; grid-template-columns: max-content 1fr; gap: 6px 18px; margin: 0 0 16px; font-size: 15px; }
+  dt { font-weight: 700; white-space: nowrap; }
+  dd { margin: 0; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">claude-dotfiles / 2026-09-02</p>
+    <h1>CLI から HTML を書いて、すぐ見て、残すための最小構成</h1>
+    <p class="lede">追加インストールなしで今日から回せる案を先に置き、増やすもの・入れないものを分けました。このページ自体がその案の第 1 号です。</p>
+  </header>
+
+  <ul class="verdicts">
+    <li class="verdict now">
+      <span class="tag">今日から</span>
+      <h3>Artifact ツール + リポジトリ内 <code>docs/reports/</code></h3>
+      <p>Claude Code に載っている Artifact 発行機能で claude.ai に非公開 URL を作り、同じ HTML をプロジェクトの <code>docs/reports/</code> に git 管理で残す。ローカルで見るときは <code>Start-Process</code> で既定ブラウザを開く。</p>
+    </li>
+    <li class="verdict later">
+      <span class="tag">必要になったら</span>
+      <h3>VS Code Live Preview / watchexec</h3>
+      <p>同じ HTML を何度も直して眺める作業が出たときだけ。VS Code は導入済みなので拡張 1 つで済む。watchexec は winget で入る。</p>
+    </li>
+    <li class="verdict skip">
+      <span class="tag">入れない</span>
+      <h3>新しいノートアプリ（Trilium / Obsidian / Logseq）</h3>
+      <p>保管庫としては優秀でも、アプリが 1 つ増えると判断の置き場が分散する。こうだいさんの場合は life-editor の Note が既に「自分のノートアプリ」なので、そこに MCP で要約を流す。</p>
+    </li>
+  </ul>
+
+  <h2>流れは 3 段だけ</h2>
+  <div class="flow">
+    <div class="step">
+      <span class="n">01 WRITE</span>
+      <h3>Claude が HTML を書く</h3>
+      <p>判断材料が 3 つ以上並ぶとき、比較表・スクショ・進捗のときだけ HTML にする。1 問 1 答はターミナルの文章のまま。</p>
+      <p>置き場: <code>docs/reports/YYYY-MM-DD-slug.html</code></p>
+    </div>
+    <div class="step">
+      <span class="n">02 VIEW</span>
+      <h3>すぐ開く</h3>
+      <p>Artifact 発行なら URL が返り、ターミナルでは <code>Ctrl+]</code> で直近のページを再表示できる。ローカルは PowerShell で 1 行。</p>
+      <p><code>Start-Process .\docs\reports\x.html</code></p>
+    </div>
+    <div class="step">
+      <span class="n">03 KEEP</span>
+      <h3>残して探せる</h3>
+      <p>claude.ai/code/artifacts の一覧と、git の <code>docs/reports/</code> の 2 か所。結論だけを life-editor の Note に MCP で流せば、スマホからも読める。</p>
+    </div>
+  </div>
+
+  <div class="callout prose">
+    <strong>確認済みの事実</strong>: 調査エージェントは「Artifacts は Team / Enterprise 限定」と報告しましたが、このセッションには Artifact ツールが載っています。本ページの発行がその実証で、URL が出ていれば無料枠で使えています。
+  </div>
+
+  <h2>この PC にあるもの・ないもの</h2>
+  <p class="prose note">2026-09-02 に <code>where.exe</code> と <code>winget list</code> で実測。</p>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>道具</th><th>導入</th><th>役割</th><th>入れ方</th><th>向き</th></tr></thead>
+      <tbody>
+        <tr><td>Artifact ツール（Claude Code）</td><td class="state yes">あり</td><td>HTML を claude.ai に発行・一覧・再表示</td><td>不要</td><td>判断材料の共有と保管。16MB 上限、外部スクリプトは cdnjs 等のみ</td></tr>
+        <tr><td>PowerShell <code>Start-Process</code></td><td class="state yes">あり</td><td>既定ブラウザでファイルを開く</td><td>不要</td><td>単発表示。ライブリロード無し</td></tr>
+        <tr><td>VS Code</td><td class="state yes">あり</td><td>Live Preview 拡張で保存時に自動更新</td><td>拡張 1 つ</td><td>同じページを何度も直すとき</td></tr>
+        <tr><td>Node / Python</td><td class="state yes">あり</td><td><code>python -m http.server</code> で <code>file://</code> 制約を回避</td><td>不要</td><td>fetch や ES module を使う HTML だけ必要</td></tr>
+        <tr><td>watchexec</td><td class="state no">なし</td><td>保存を監視して任意コマンド実行</td><td><code>winget install watchexec.watchexec</code></td><td>自動で開き直したいとき</td></tr>
+        <tr><td>browser-sync / live-server</td><td class="state no">なし</td><td>ライブリロード付きローカルサーバー</td><td><code>npm i -g browser-sync</code></td><td>live-server 本家は 2026-06 にアーカイブ。使うなら browser-sync</td></tr>
+        <tr><td>quarto / marp / typst / pandoc</td><td class="state no">なし</td><td>Markdown から HTML / スライド / PDF</td><td>winget / npm</td><td>Claude が直接 HTML を書くなら不要</td></tr>
+        <tr><td>Trilium / Obsidian / Logseq / SiYuan</td><td class="state no">なし</td><td>HTML やノートの保管庫</td><td>各公式</td><td>life-editor Note があるので見送り</td></tr>
+        <tr><td>life-editor MCP（Note 作成）</td><td class="state maybe">stdio 直叩きで可</td><td>結論を Note に流す</td><td>このセッションは未登録。<code>/mcp</code> 登録は life-editor 側の設定</td><td>要約向き。生 HTML は貼れない（ブロック構造）</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>ハーネスとして固定するもの</h2>
+  <div class="prose">
+    <p>枠組みは「いつ HTML にするか」「どこに置くか」「どう開くか」の 3 つの約束だけです。台所の定位置決めと同じで、置き場が決まっていれば探す時間が消えます。</p>
+    <dl>
+      <dt>いつ</dt><dd>選択肢が 3 つ以上ある判断、比較表、スクリーンショット付きの確認、進捗の俯瞰。1 つの答えを返すだけならターミナルの文章</dd>
+      <dt>どこ</dt><dd>プロジェクトなら <code>docs/reports/YYYY-MM-DD-slug.html</code>（life-editor には 2026-06-19 の HTML レポートが既にあり、前例に沿う）。プロジェクト外なら dotfiles の <code>claude/docs/reports/</code></dd>
+      <dt>どう開く</dt><dd>Artifact 発行を第一候補、失敗したら <code>Start-Process</code>。両方の結果（URL とパス）を報告の末尾に必ず書く</dd>
+      <dt>見た目</dt><dd>1 ファイル完結・ライト / ダーク両対応・結論カードを最上段に。フォントは判読性重視の UD 系（本ページは BIZ UDPGothic）</dd>
+      <dt>残し方</dt><dd>git に commit。判断が要るものは結論だけ life-editor Note に流し、本文は URL で参照</dd>
+    </dl>
+    <p>この約束はグローバル skill <code>html-report</code> として dotfiles に置くのが収まりがよいです（description は起動条件だけ、テンプレートは本文に）。今回は設計までで、skill ファイルは作っていません。</p>
+  </div>
+
+  <h2>PowerShell からの最短手順</h2>
+<pre><code># 1. Claude Code に「HTML で」と頼む → docs/reports/ に書かれ、Artifact の URL が返る
+# 2. ローカルで開く（既定ブラウザ）
+Start-Process .\docs\reports\2026-09-02-html-report-harness.html
+
+# 3. 直しながら眺めるときだけ（VS Code Live Preview を入れていれば）
+code --goto .\docs\reports\2026-09-02-html-report-harness.html
+
+# 4. 直近の Artifact をターミナルから再表示
+#    Ctrl+]   または   /artifacts</code></pre>
+
+  <h2>未確認のこと</h2>
+  <ul class="prose">
+    <li>Artifact の無料枠での継続利用可否。本ページが発行できれば今日時点は可。プランの条件は公式ブログ（claude.com/blog/artifacts-in-claude-code）が正</li>
+    <li>VS Code Live Preview の HTML 内 <code>fetch</code> 挙動。ローカルサーバー経由なので動くはずだが未実測</li>
+    <li>mdserve（AI エージェント向け Markdown プレビュー）の Windows 対応。Rust 製で理屈上は動くが公式に明記なし</li>
+  </ul>
+</div>
