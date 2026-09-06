@@ -80,7 +80,14 @@ for (const entry of manifest.entries) {
     } catch {
       /* dest が無い / 読めない → 通常フロー */
     }
-    const bak = backup(dest);
+    // template は Claude Code 本体 (/model, /effort) や orca が live 側を書き換えるため
+    // 差分が出やすい。backup() で退避すると install のたびに .bak.N が増えるので、
+    // ここだけは 1 世代 (<name>.prev) を上書き保存に留める。
+    let bak = null;
+    if (fs.existsSync(dest)) {
+      bak = `${dest}.prev`;
+      fs.copyFileSync(dest, bak);
+    }
     fs.writeFileSync(dest, content);
     results.push({ dest: entry.dest, method: "template→copy", backup: bak });
     continue;
